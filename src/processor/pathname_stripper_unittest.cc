@@ -27,7 +27,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <stdio.h>
+
 #include "processor/pathname_stripper.h"
+#include "processor/logging.h"
 
 #define ASSERT_TRUE(condition) \
   if (!(condition)) { \
@@ -39,7 +42,7 @@
 
 namespace {
 
-using google_airbag::PathnameStripper;
+using google_breakpad::PathnameStripper;
 
 static bool RunTests() {
   ASSERT_EQ(PathnameStripper::File("/dir/file"), "file");
@@ -78,5 +81,7 @@ static bool RunTests() {
 }  // namespace
 
 int main(int argc, char **argv) {
+  BPLOG_INIT(&argc, &argv);
+
   return RunTests() ? 0 : 1;
 }

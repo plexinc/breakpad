@@ -1,16 +1,31 @@
-// Copyright (C) 2006 Google Inc.
+// Copyright (c) 2006, Google Inc.
+// All rights reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // stackwalker_selftest.cc: Tests StackwalkerX86 or StackwalkerPPC using the
 // running process' stack as test data, if running on an x86 or ppc and
@@ -34,33 +49,51 @@
 //
 // Author: Mark Mentovai
 
-#if defined(__GNUC__) && (defined(__i386__) || defined(__ppc__))
+#include "processor/logging.h"
+
+#if defined(__i386) && !defined(__i386__)
+#define __i386__
+#endif
+#if defined(__sparc) && !defined(__sparc__)
+#define __sparc__
+#endif
+ 
+#if (defined(__SUNPRO_CC) || defined(__GNUC__)) && \
+    (defined(__i386__) || defined(__ppc__) || defined(__sparc__))
 
 
-#include <cstdio>
+#include <stdio.h>
 
-#include "google_airbag/common/airbag_types.h"
-#include "google_airbag/common/minidump_format.h"
-#include "google_airbag/processor/call_stack.h"
-#include "google_airbag/processor/memory_region.h"
-#include "google_airbag/processor/stack_frame.h"
-#include "google_airbag/processor/stack_frame_cpu.h"
-#include "processor/scoped_ptr.h"
+#include "common/scoped_ptr.h"
+#include "google_breakpad/common/breakpad_types.h"
+#include "google_breakpad/common/minidump_format.h"
+#include "google_breakpad/processor/basic_source_line_resolver.h"
+#include "google_breakpad/processor/call_stack.h"
+#include "google_breakpad/processor/code_module.h"
+#include "google_breakpad/processor/memory_region.h"
+#include "google_breakpad/processor/stack_frame.h"
+#include "google_breakpad/processor/stack_frame_cpu.h"
 
-using google_airbag::CallStack;
-using google_airbag::MemoryRegion;
-using google_airbag::scoped_ptr;
-using google_airbag::StackFrame;
-using google_airbag::StackFramePPC;
-using google_airbag::StackFrameX86;
+using google_breakpad::BasicSourceLineResolver;
+using google_breakpad::CallStack;
+using google_breakpad::CodeModule;
+using google_breakpad::MemoryRegion;
+using google_breakpad::scoped_ptr;
+using google_breakpad::StackFrame;
+using google_breakpad::StackFramePPC;
+using google_breakpad::StackFrameX86;
+using google_breakpad::StackFrameSPARC;
 
 #if defined(__i386__)
 #include "processor/stackwalker_x86.h"
-using google_airbag::StackwalkerX86;
+using google_breakpad::StackwalkerX86;
 #elif defined(__ppc__)
 #include "processor/stackwalker_ppc.h"
-using google_airbag::StackwalkerPPC;
-#endif  // __i386__ || __ppc__
+using google_breakpad::StackwalkerPPC;
+#elif defined(__sparc__)
+#include "processor/stackwalker_sparc.h"
+using google_breakpad::StackwalkerSPARC;
+#endif  // __i386__ || __ppc__ || __sparc__
 
 #define RECURSION_DEPTH 100
 
@@ -69,20 +102,20 @@ using google_airbag::StackwalkerPPC;
 // process' memory space by pointer.
 class SelfMemoryRegion : public MemoryRegion {
  public:
-  virtual u_int64_t GetBase() { return 0; }
-  virtual u_int32_t GetSize() { return 0xffffffff; }
+  virtual uint64_t GetBase() { return 0; }
+  virtual uint32_t GetSize() { return 0xffffffff; }
 
-  bool GetMemoryAtAddress(u_int64_t address, u_int8_t*  value) {
+  bool GetMemoryAtAddress(uint64_t address, uint8_t*  value) {
       return GetMemoryAtAddressInternal(address, value); }
-  bool GetMemoryAtAddress(u_int64_t address, u_int16_t* value) {
+  bool GetMemoryAtAddress(uint64_t address, uint16_t* value) {
       return GetMemoryAtAddressInternal(address, value); }
-  bool GetMemoryAtAddress(u_int64_t address, u_int32_t* value) {
+  bool GetMemoryAtAddress(uint64_t address, uint32_t* value) {
       return GetMemoryAtAddressInternal(address, value); }
-  bool GetMemoryAtAddress(u_int64_t address, u_int64_t* value) {
+  bool GetMemoryAtAddress(uint64_t address, uint64_t* value) {
       return GetMemoryAtAddressInternal(address, value); }
 
  private:
-  template<typename T> bool GetMemoryAtAddressInternal(u_int64_t address,
+  template<typename T> bool GetMemoryAtAddressInternal(uint64_t address,
                                                        T*        value) {
     // Without knowing what addresses are actually mapped, just assume that
     // everything low is not mapped.  This helps the stackwalker catch the
@@ -92,11 +125,14 @@ class SelfMemoryRegion : public MemoryRegion {
     if (address < 0x100)
       return false;
 
-    u_int8_t* memory = 0;
+    uint8_t* memory = 0;
     *value = *reinterpret_cast<const T*>(&memory[address]);
     return true;
   }
 };
+
+
+#if defined(__GNUC__)
 
 
 #if defined(__i386__)
@@ -108,9 +144,9 @@ class SelfMemoryRegion : public MemoryRegion {
 // on the stack (provided frame pointers are not being omitted.)  Because
 // this function depends on the compiler-generated preamble, inlining is
 // disabled.
-static u_int32_t GetEBP() __attribute__((noinline));
-static u_int32_t GetEBP() {
-  u_int32_t ebp;
+static uint32_t GetEBP() __attribute__((noinline));
+static uint32_t GetEBP() {
+  uint32_t ebp;
   __asm__ __volatile__(
     "movl (%%ebp), %0"
     : "=a" (ebp)
@@ -124,9 +160,9 @@ static u_int32_t GetEBP() {
 // The CALL instruction places a 4-byte return address on the stack above
 // the caller's %esp, and this function's prolog will save the caller's %ebp
 // on the stack as well, for another 4 bytes, before storing %esp in %ebp.
-static u_int32_t GetESP() __attribute__((noinline));
-static u_int32_t GetESP() {
-  u_int32_t ebp;
+static uint32_t GetESP() __attribute__((noinline));
+static uint32_t GetESP() {
+  uint32_t ebp;
   __asm__ __volatile__(
     "movl %%ebp, %0"
     : "=a" (ebp)
@@ -145,9 +181,9 @@ static u_int32_t GetESP() {
 // because GetEBP and stackwalking necessarily depends on access to frame
 // pointers.  Because this function depends on a call instruction and the
 // compiler-generated preamble, inlining is disabled.
-static u_int32_t GetEIP() __attribute__((noinline));
-static u_int32_t GetEIP() {
-  u_int32_t eip;
+static uint32_t GetEIP() __attribute__((noinline));
+static uint32_t GetEIP() {
+  uint32_t eip;
   __asm__ __volatile__(
     "movl 4(%%ebp), %0"
     : "=a" (eip)
@@ -165,9 +201,9 @@ static u_int32_t GetEIP() {
 // pointer.  Dereference %r1 to obtain the caller's stack pointer, which the
 // compiler-generated prolog stored on the stack.  Because this function
 // depends on the compiler-generated prolog, inlining is disabled.
-static u_int32_t GetSP() __attribute__((noinline));
-static u_int32_t GetSP() {
-  u_int32_t sp;
+static uint32_t GetSP() __attribute__((noinline));
+static uint32_t GetSP() {
+  uint32_t sp;
   __asm__ __volatile__(
     "lwz %0, 0(r1)"
     : "=r" (sp)
@@ -181,9 +217,9 @@ static u_int32_t GetSP() {
 // link register, where it was placed by the branch instruction that called
 // GetPC.  Because this function depends on the caller's use of a branch
 // instruction, inlining is disabled.
-static u_int32_t GetPC() __attribute__((noinline));
-static u_int32_t GetPC() {
-  u_int32_t lr;
+static uint32_t GetPC() __attribute__((noinline));
+static uint32_t GetPC() {
+  uint32_t lr;
   __asm__ __volatile__(
     "mflr %0"
     : "=r" (lr)
@@ -192,16 +228,90 @@ static u_int32_t GetPC() {
 }
 
 
-#endif  // __i386__ || __ppc__
+#elif defined(__sparc__)
 
+
+// GetSP returns the current value of the %sp/%o6/%g_r[14] register, which 
+// by convention, is the stack pointer on sparc.  Because it's implemented
+// as a function, %sp itself contains GetSP's own stack pointer and not 
+// the caller's stack pointer.  Dereference  to obtain the caller's stack 
+// pointer, which the compiler-generated prolog stored on the stack.
+// Because this function depends on the compiler-generated prolog, inlining
+// is disabled.
+static uint32_t GetSP() __attribute__((noinline));
+static uint32_t GetSP() {
+  uint32_t sp;
+  __asm__ __volatile__(
+    "mov %%fp, %0"
+    : "=r" (sp)
+  );
+  return sp;
+}
+
+// GetFP returns the current value of the %fp register.  Because it's
+// implemented as a function, %fp itself contains GetFP's frame pointer
+// and not the caller's frame pointer.  Dereference %fp to obtain the
+// caller's frame pointer, which the compiler-generated preamble stored
+// on the stack (provided frame pointers are not being omitted.)  Because
+// this function depends on the compiler-generated preamble, inlining is
+// disabled.
+static uint32_t GetFP() __attribute__((noinline));
+static uint32_t GetFP() {
+  uint32_t fp;
+  __asm__ __volatile__(
+    "ld [%%fp+56], %0"
+    : "=r" (fp)
+  );
+  return fp;
+}
+
+// GetPC returns the program counter identifying the next instruction to
+// execute after GetPC returns.  It obtains this information from the
+// link register, where it was placed by the branch instruction that called
+// GetPC.  Because this function depends on the caller's use of a branch
+// instruction, inlining is disabled.
+static uint32_t GetPC() __attribute__((noinline));
+static uint32_t GetPC() {
+  uint32_t pc;
+  __asm__ __volatile__(
+    "mov %%i7, %0"
+    : "=r" (pc)
+  );
+  return pc + 8;
+}
+
+#endif  // __i386__ || __ppc__ || __sparc__
+
+#elif defined(__SUNPRO_CC)
+
+#if defined(__i386__)
+extern "C" {
+extern uint32_t GetEIP();
+extern uint32_t GetEBP();
+extern uint32_t GetESP();
+}
+#elif defined(__sparc__)
+extern "C" {
+extern uint32_t GetPC();
+extern uint32_t GetFP();
+extern uint32_t GetSP();
+}
+#endif // __i386__ || __sparc__
+
+#endif // __GNUC__ || __SUNPRO_CC
 
 // CountCallerFrames returns the number of stack frames beneath the function
 // that called CountCallerFrames.  Because this function's return value
 // is dependent on the size of the stack beneath it, inlining is disabled,
 // and any function that calls this should not be inlined either.
+#if defined(__GNUC__)
 static unsigned int CountCallerFrames() __attribute__((noinline));
+#elif defined(__SUNPRO_CC)
+static unsigned int CountCallerFrames();
+#endif
 static unsigned int CountCallerFrames() {
   SelfMemoryRegion memory;
+  BasicSourceLineResolver resolver;
 
 #if defined(__i386__)
   MDRawContextX86 context = MDRawContextX86();
@@ -209,24 +319,36 @@ static unsigned int CountCallerFrames() {
   context.ebp = GetEBP();
   context.esp = GetESP();
 
-  StackwalkerX86 stackwalker = StackwalkerX86(&context, &memory, NULL, NULL);
+  StackwalkerX86 stackwalker = StackwalkerX86(NULL, &context, &memory, NULL,
+                                              NULL, &resolver);
 #elif defined(__ppc__)
   MDRawContextPPC context = MDRawContextPPC();
   context.srr0 = GetPC();
   context.gpr[1] = GetSP();
 
-  StackwalkerPPC stackwalker = StackwalkerPPC(&context, &memory, NULL, NULL);
-#endif  // __i386__ || __ppc__
+  StackwalkerPPC stackwalker = StackwalkerPPC(NULL, &context, &memory, NULL,
+                                              NULL, &resolver);
+#elif defined(__sparc__)
+  MDRawContextSPARC context = MDRawContextSPARC();
+  context.pc = GetPC();
+  context.g_r[14] = GetSP();
+  context.g_r[30] = GetFP();
 
-  scoped_ptr<CallStack> stack(stackwalker.Walk());
+  StackwalkerSPARC stackwalker = StackwalkerSPARC(NULL, &context, &memory,
+                                                  NULL, NULL, &resolver);
+#endif  // __i386__ || __ppc__ || __sparc__
+
+  CallStack stack;
+  vector<const CodeModule*> modules_without_symbols;
+  stackwalker.Walk(&stack, &modules_without_symbols);
 
 #ifdef PRINT_STACKS
   printf("\n");
   for (unsigned int frame_index = 0;
-      frame_index < stack->frames()->size();
+      frame_index < stack.frames()->size();
       ++frame_index) {
-    StackFrame *frame = stack->frames()->at(frame_index);
-    printf("frame %-3d  instruction = 0x%08llx",
+    StackFrame *frame = stack.frames()->at(frame_index);
+    printf("frame %-3d  instruction = 0x%08" PRIx64,
            frame_index, frame->instruction);
 #if defined(__i386__)
     StackFrameX86 *frame_x86 = reinterpret_cast<StackFrameX86*>(frame);
@@ -235,14 +357,18 @@ static unsigned int CountCallerFrames() {
 #elif defined(__ppc__)
     StackFramePPC *frame_ppc = reinterpret_cast<StackFramePPC*>(frame);
     printf("  gpr[1] = 0x%08x\n", frame_ppc->context.gpr[1]);
-#endif  // __i386__ || __ppc__
+#elif defined(__sparc__)
+    StackFrameSPARC *frame_sparc = reinterpret_cast<StackFrameSPARC*>(frame);
+    printf("  sp = 0x%08x  fp = 0x%08x\n",
+           frame_sparc->context.g_r[14], frame_sparc->context.g_r[30]);
+#endif  // __i386__ || __ppc__ || __sparc__
   }
 #endif  // PRINT_STACKS
 
   // Subtract 1 because the caller wants the number of frames beneath
   // itself.  Because the caller called us, subract two for our frame and its
-  // frame, which are included in stack->size().
-  return stack->frames()->size() - 2;
+  // frame, which are included in stack.size().
+  return stack.frames()->size() - 2;
 }
 
 
@@ -251,8 +377,12 @@ static unsigned int CountCallerFrames() {
 // have been reached, Recursor stops checking and returns success.  If the
 // frame count check fails at any depth, Recursor will stop and return false.
 // Because this calls CountCallerFrames, inlining is disabled.
+#if defined(__GNUC__)
 static bool Recursor(unsigned int depth, unsigned int parent_callers)
     __attribute__((noinline));
+#elif defined(__SUNPRO_CC)
+static bool Recursor(unsigned int depth, unsigned int parent_callers);
+#endif
 static bool Recursor(unsigned int depth, unsigned int parent_callers) {
   unsigned int callers = CountCallerFrames();
   if (callers != parent_callers + 1)
@@ -269,22 +399,30 @@ static bool Recursor(unsigned int depth, unsigned int parent_callers) {
 // Because this calls CountCallerFrames, inlining is disabled - but because
 // it's main (and nobody calls it other than the entry point), it wouldn't
 // be inlined anyway.
+#if defined(__GNUC__)
 int main(int argc, char** argv) __attribute__((noinline));
+#elif defined(__SUNPRO_CC)
+int main(int argc, char** argv);
+#endif
 int main(int argc, char** argv) {
+  BPLOG_INIT(&argc, &argv);
+
   return Recursor(RECURSION_DEPTH, CountCallerFrames()) ? 0 : 1;
 }
 
 
-#else  // __GNUC__ && (__i386__ || __ppc__)
-// Not gcc?  We use gcc's __asm__.
-// Not i386 or ppc?  We can only test stacks we know how to walk.
+#else
+// Not i386 or ppc or sparc?  We can only test stacks we know how to walk.
 
 
 int main(int argc, char **argv) {
+  BPLOG_INIT(&argc, &argv);
+
   // "make check" interprets an exit status of 77 to mean that the test is
   // not supported.
+  BPLOG(ERROR) << "Selftest not supported here";
   return 77;
 }
 
 
-#endif  // __GNUC__ && (__i386__ || __ppc__)
+#endif  // (__GNUC__ || __SUNPRO_CC) && (__i386__ || __ppc__ || __sparc__)

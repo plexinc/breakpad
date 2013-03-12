@@ -27,36 +27,71 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// minidump_file_writer.h:  Implements file-based minidump generation
+// minidump_file_writer.h:  Implements file-based minidump generation.  It's
+// intended to be used with the Google Breakpad open source crash handling
+// project.
 
 #ifndef CLIENT_MINIDUMP_FILE_WRITER_H__
 #define CLIENT_MINIDUMP_FILE_WRITER_H__
 
 #include <string>
 
-#include "google_airbag/common/minidump_format.h"
+#include "google_breakpad/common/minidump_format.h"
 
-namespace google_airbag {
+namespace google_breakpad {
+
+class UntypedMDRVA;
+template<typename MDType> class TypedMDRVA;
+
+// The user of this class can Open() a file and add minidump streams, data, and
+// strings using the definitions in minidump_format.h.  Since this class is
+// expected to be used in a situation where the current process may be
+// damaged, it will not allocate heap memory.
+// Sample usage:
+// MinidumpFileWriter writer;
+// writer.Open("/tmp/minidump.dmp");
+// TypedMDRVA<MDRawHeader> header(&writer_);
+// header.Allocate();
+// header->get()->signature = MD_HEADER_SIGNATURE;
+//  :
+// writer.Close();
+//
+// An alternative is to use SetFile and provide a file descriptor:
+// MinidumpFileWriter writer;
+// writer.SetFile(minidump_fd);
+// TypedMDRVA<MDRawHeader> header(&writer_);
+// header.Allocate();
+// header->get()->signature = MD_HEADER_SIGNATURE;
+//  :
+// writer.Close();
 
 class MinidumpFileWriter {
- public:
+public:
   // Invalid MDRVA (Minidump Relative Virtual Address)
   // returned on failed allocation
-  static const MDRVA kInvalidMDRVA = static_cast<MDRVA>(-1);
+  static const MDRVA kInvalidMDRVA;
 
   MinidumpFileWriter();
   ~MinidumpFileWriter();
 
   // Open |path| as the destination of the minidump data.  Any existing file
   // will be overwritten.
-  // Return true on success, or false on failure
-  bool Open(const std::string &path);
+  // Return true on success, or false on failure.
+  bool Open(const char *path);
 
-  // Close the current file
-  // Return true on success, or false on failure
+  // Sets the file descriptor |file| as the destination of the minidump data.
+  // Can be used as an alternative to Open() when a file descriptor is
+  // available.
+  // Note that |fd| is not closed when the instance of MinidumpFileWriter is
+  // destroyed.
+  void SetFile(const int file);
+
+  // Close the current file (that was either created when Open was called, or
+  // specified with SetFile).
+  // Return true on success, or false on failure.
   bool Close();
 
-  // Write |str| to a MDString.
+  // Copy the contents of |str| to a MDString and write it to the file.
   // |str| is expected to be either UTF-16 or UTF-32 depending on the size
   // of wchar_t.
   // Maximum |length| of characters to copy from |str|, or specify 0 to use the
@@ -66,7 +101,7 @@ class MinidumpFileWriter {
   bool WriteString(const wchar_t *str, unsigned int length,
                    MDLocationDescriptor *location);
 
-  // Similar to above with |str| as an UTF-8 encoded string
+  // Same as above, except with |str| as a UTF-8 string
   bool WriteString(const char *str, unsigned int length,
                    MDLocationDescriptor *location);
 
@@ -79,7 +114,7 @@ class MinidumpFileWriter {
   bool Copy(MDRVA position, const void *src, ssize_t size);
 
   // Return the current position for writing to the minidump
-  MDRVA position() const { return position_; }
+  inline MDRVA position() const { return position_; }
 
  private:
   friend class UntypedMDRVA;
@@ -89,14 +124,32 @@ class MinidumpFileWriter {
   // unable to allocate the bytes.
   MDRVA Allocate(size_t size);
 
-  // The file descriptor for the output file
+  // The file descriptor for the output file.
   int file_;
+
+  // Whether |file_| should be closed when the instance is destroyed.
+  bool close_file_when_destroyed_;
 
   // Current position in buffer
   MDRVA position_;
 
   // Current allocated size
   size_t size_;
+
+  // Copy |length| characters from |str| to |mdstring|.  These are distinct
+  // because the underlying MDString is a UTF-16 based string.  The wchar_t
+  // variant may need to create a MDString that has more characters than the
+  // source |str|, whereas the UTF-8 variant may coalesce characters to form
+  // a single UTF-16 character.
+  bool CopyStringToMDString(const wchar_t *str, unsigned int length,
+                            TypedMDRVA<MDString> *mdstring);
+  bool CopyStringToMDString(const char *str, unsigned int length,
+                            TypedMDRVA<MDString> *mdstring);
+
+  // The common templated code for writing a string
+  template <typename CharType>
+  bool WriteStringCore(const CharType *str, unsigned int length,
+                       MDLocationDescriptor *location);
 };
 
 // Represents an untyped allocated chunk
@@ -109,34 +162,27 @@ class UntypedMDRVA {
 
   // Allocates |size| bytes.  Must not call more than once.
   // Return true on success, or false on failure
-  bool Allocate(size_t size) {
-    assert(size_ == 0);
-    size_ = size;
-    position_ = writer_->Allocate(size_);
-    return position_ != MinidumpFileWriter::kInvalidMDRVA;
-  }
+  bool Allocate(size_t size);
 
   // Returns the current position or kInvalidMDRVA if allocation failed
-  MDRVA position() const { return position_; }
+  inline MDRVA position() const { return position_; }
 
   // Number of bytes allocated
-  size_t size() const { return size_; }
+  inline size_t size() const { return size_; }
 
   // Return size and position
-  MDLocationDescriptor location() const {
-    MDLocationDescriptor location = { size_, position_ };
+  inline MDLocationDescriptor location() const {
+    MDLocationDescriptor location = { static_cast<uint32_t>(size_),
+                                      position_ };
     return location;
   }
 
   // Copy |size| bytes starting at |src| into the minidump at |position|
   // Return true on success, or false on failure
-  bool Copy(MDRVA position, const void *src, size_t size) {
-    assert(position + size <= position_ + size_);
-    return writer_->Copy(position, src, size);
-  }
+  bool Copy(MDRVA position, const void *src, size_t size);
 
   // Copy |size| bytes from |src| to the current position
-  bool Copy(const void *src, size_t size) {
+  inline bool Copy(const void *src, size_t size) {
     return Copy(position_, src, size);
   }
 
@@ -165,7 +211,7 @@ class TypedMDRVA : public UntypedMDRVA {
         data_(),
         allocation_state_(UNALLOCATED) {}
 
-  ~TypedMDRVA() {
+  inline ~TypedMDRVA() {
     // Ensure that the data_ object is written out
     if (allocation_state_ != ARRAY)
       Flush();
@@ -176,12 +222,12 @@ class TypedMDRVA : public UntypedMDRVA {
   // alter its contents.
   MDType *get() { return &data_; }
 
-  // Allocates sizeof(MDType) bytes.
+  // Allocates minidump_size<MDType>::size() bytes.
   // Must not call more than once.
   // Return true on success, or false on failure
   bool Allocate();
 
-  // Allocates sizeof(MDType) + |additional| bytes.
+  // Allocates minidump_size<MDType>::size() + |additional| bytes.
   // Must not call more than once.
   // Return true on success, or false on failure
   bool Allocate(size_t additional);
@@ -194,7 +240,7 @@ class TypedMDRVA : public UntypedMDRVA {
   // Allocate an array of |count| elements of |size| after object of MDType
   // Must not call more than once.
   // Return true on success, or false on failure
-  bool AllocateObjectAndArray(unsigned int count, size_t size);
+  bool AllocateObjectAndArray(size_t count, size_t size);
 
   // Copy |item| to |index|
   // Must have been allocated using AllocateArray().
@@ -204,7 +250,7 @@ class TypedMDRVA : public UntypedMDRVA {
   // Copy |size| bytes starting at |str| to |index|
   // Must have been allocated using AllocateObjectAndArray().
   // Return true on success, or false on failure
-  bool CopyIndexAfterObject(unsigned int index, void *src, size_t size);
+  bool CopyIndexAfterObject(unsigned int index, const void *src, size_t size);
 
   // Write data_
   bool Flush();
@@ -221,6 +267,6 @@ class TypedMDRVA : public UntypedMDRVA {
   AllocationState allocation_state_;
 };
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 #endif  // CLIENT_MINIDUMP_FILE_WRITER_H__

@@ -28,8 +28,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <atlbase.h>
-#include <DbgHelp.h>
 #include <dia2.h>
+#include <ImageHlp.h>
 #include <stdio.h>
 
 #include "common/windows/string_utils-inl.h"
@@ -43,7 +43,25 @@
 #define UNDNAME_NO_ECSU 0x8000  // Suppresses enum/class/struct/union.
 #endif  // UNDNAME_NO_ECSU
 
-namespace google_airbag {
+namespace google_breakpad {
+
+using std::vector;
+
+// A helper class to scope a PLOADED_IMAGE.
+class AutoImage {
+ public:
+  explicit AutoImage(PLOADED_IMAGE img) : img_(img) {}
+  ~AutoImage() {
+    if (img_)
+      ImageUnload(img_);
+  }
+
+  operator PLOADED_IMAGE() { return img_; }
+  PLOADED_IMAGE operator->() { return img_; }
+
+ private:
+  PLOADED_IMAGE img_;
+};
 
 PDBSourceLineWriter::PDBSourceLineWriter() : output_(NULL) {
 }
@@ -61,30 +79,37 @@ bool PDBSourceLineWriter::Open(const wstring &file, FileFormat format) {
 
   CComPtr<IDiaDataSource> data_source;
   if (FAILED(data_source.CoCreateInstance(CLSID_DiaSource))) {
-    fprintf(stderr, "CoCreateInstance CLSID_DiaSource failed "
-            "(msdia80.dll unregistered?)\n");
+    const int kGuidSize = 64;
+    wchar_t classid[kGuidSize] = {0};
+    StringFromGUID2(CLSID_DiaSource, classid, kGuidSize);
+    // vc80 uses bce36434-2c24-499e-bf49-8bd99b0eeb68.
+    // vc90 uses 4C41678E-887B-4365-A09E-925D28DB33C2.
+    fprintf(stderr, "CoCreateInstance CLSID_DiaSource %S failed "
+            "(msdia*.dll unregistered?)\n", classid);
     return false;
   }
 
   switch (format) {
     case PDB_FILE:
       if (FAILED(data_source->loadDataFromPdb(file.c_str()))) {
-        fprintf(stderr, "loadDataFromPdb failed\n");
+        fprintf(stderr, "loadDataFromPdb failed for %ws\n", file.c_str());
         return false;
       }
       break;
     case EXE_FILE:
       if (FAILED(data_source->loadDataForExe(file.c_str(), NULL, NULL))) {
-        fprintf(stderr, "loadDataForExe failed\n");
+        fprintf(stderr, "loadDataForExe failed for %ws\n", file.c_str());
         return false;
       }
+      code_file_ = file;
       break;
     case ANY_FILE:
       if (FAILED(data_source->loadDataFromPdb(file.c_str()))) {
         if (FAILED(data_source->loadDataForExe(file.c_str(), NULL, NULL))) {
-          fprintf(stderr, "loadDataForPdb and loadDataFromExe failed\n");
+          fprintf(stderr, "loadDataForPdb and loadDataFromExe failed for %ws\n", file.c_str());
           return false;
         }
+	code_file_ = file;
       }
       break;
     default:
@@ -118,11 +143,13 @@ bool PDBSourceLineWriter::PrintLines(IDiaEnumLineNumbers *lines) {
       return false;
     }
 
-    DWORD source_id;
-    if (FAILED(line->get_sourceFileId(&source_id))) {
+    DWORD dia_source_id;
+    if (FAILED(line->get_sourceFileId(&dia_source_id))) {
       fprintf(stderr, "failed to get line source file id\n");
       return false;
     }
+    // duplicate file names are coalesced to share one ID
+    DWORD source_id = GetRealFileID(dia_source_id);
 
     DWORD line_num;
     if (FAILED(line->get_lineNumber(&line_num))) {
@@ -136,19 +163,25 @@ bool PDBSourceLineWriter::PrintLines(IDiaEnumLineNumbers *lines) {
   return true;
 }
 
-bool PDBSourceLineWriter::PrintFunction(IDiaSymbol *function) {
+bool PDBSourceLineWriter::PrintFunction(IDiaSymbol *function,
+                                        IDiaSymbol *block) {
   // The function format is:
   // FUNC <address> <length> <param_stack_size> <function>
   DWORD rva;
-  if (FAILED(function->get_relativeVirtualAddress(&rva))) {
+  if (FAILED(block->get_relativeVirtualAddress(&rva))) {
     fprintf(stderr, "couldn't get rva\n");
     return false;
   }
 
   ULONGLONG length;
-  if (FAILED(function->get_length(&length))) {
+  if (FAILED(block->get_length(&length))) {
     fprintf(stderr, "failed to get function length\n");
     return false;
+  }
+
+  if (length == 0) {
+    // Silently ignore zero-length functions, which can infrequently pop up.
+    return true;
   }
 
   CComBSTR name;
@@ -210,7 +243,16 @@ bool PDBSourceLineWriter::PrintSourceFiles() {
         return false;
       }
 
-      fwprintf(output_, L"FILE %d %s\n", file_id, file_name);
+      wstring file_name_string(file_name);
+      if (!FileIDIsCached(file_name_string)) {
+        // this is a new file name, cache it and output a FILE line.
+        CacheFileID(file_name_string, file_id);
+        fwprintf(output_, L"FILE %d %s\n", file_id, file_name);
+      } else {
+        // this file name has already been seen, just save this
+        // ID for later lookup.
+        StoreDuplicateFileID(file_name_string, file_id);
+      }
       file.Release();
     }
     compiland.Release();
@@ -250,7 +292,7 @@ bool PDBSourceLineWriter::PrintFunctions() {
     // that PDBSourceLineWriter will output either a FUNC or PUBLIC line,
     // but not both.
     if (tag == SymTagFunction) {
-      if (!PrintFunction(symbol)) {
+      if (!PrintFunction(symbol, symbol)) {
         return false;
       }
     } else if (tag == SymTagPublicSymbol) {
@@ -260,6 +302,64 @@ bool PDBSourceLineWriter::PrintFunctions() {
     }
     symbol.Release();
   } while (SUCCEEDED(symbols->Next(1, &symbol, &count)) && count == 1);
+
+  // When building with PGO, the compiler can split functions into
+  // "hot" and "cold" blocks, and move the "cold" blocks out to separate
+  // pages, so the function can be noncontiguous. To find these blocks,
+  // we have to iterate over all the compilands, and then find blocks
+  // that are children of them. We can then find the lexical parents
+  // of those blocks and print out an extra FUNC line for blocks
+  // that are not contained in their parent functions.
+  CComPtr<IDiaSymbol> global;
+  if (FAILED(session_->get_globalScope(&global))) {
+    fprintf(stderr, "get_globalScope failed\n");
+    return false;
+  }
+
+  CComPtr<IDiaEnumSymbols> compilands;
+  if (FAILED(global->findChildren(SymTagCompiland, NULL,
+                                  nsNone, &compilands))) {
+    fprintf(stderr, "findChildren failed on the global\n");
+    return false;
+  }
+
+  CComPtr<IDiaSymbol> compiland;
+  while (SUCCEEDED(compilands->Next(1, &compiland, &count)) && count == 1) {
+    CComPtr<IDiaEnumSymbols> blocks;
+    if (FAILED(compiland->findChildren(SymTagBlock, NULL,
+                                       nsNone, &blocks))) {
+      fprintf(stderr, "findChildren failed on a compiland\n");
+      return false;
+    }
+
+    CComPtr<IDiaSymbol> block;
+    while (SUCCEEDED(blocks->Next(1, &block, &count)) && count == 1) {
+      // find this block's lexical parent function
+      CComPtr<IDiaSymbol> parent;
+      DWORD tag;
+      if (SUCCEEDED(block->get_lexicalParent(&parent)) &&
+          SUCCEEDED(parent->get_symTag(&tag)) &&
+          tag == SymTagFunction) {
+        // now get the block's offset and the function's offset and size,
+        // and determine if the block is outside of the function
+        DWORD func_rva, block_rva;
+        ULONGLONG func_length;
+        if (SUCCEEDED(block->get_relativeVirtualAddress(&block_rva)) &&
+            SUCCEEDED(parent->get_relativeVirtualAddress(&func_rva)) &&
+            SUCCEEDED(parent->get_length(&func_length))) {
+          if (block_rva < func_rva || block_rva > (func_rva + func_length)) {
+            if (!PrintFunction(parent, block)) {
+              return false;
+            }
+          }
+        }
+      }
+      parent.Release();
+      block.Release();
+    }
+    blocks.Release();
+    compiland.Release();
+  }
 
   return true;
 }
@@ -286,6 +386,11 @@ bool PDBSourceLineWriter::PrintFrameData() {
   }
   if (!frame_data_enum)
     return false;
+
+  DWORD last_type = -1;
+  DWORD last_rva = -1;
+  DWORD last_code_size = 0;
+  DWORD last_prolog_size = -1;
 
   CComPtr<IDiaFrameData> frame_data;
   while (SUCCEEDED(frame_data_enum->Next(1, &frame_data, &count)) &&
@@ -348,14 +453,27 @@ bool PDBSourceLineWriter::PrintFrameData() {
       }
     }
 
-    fprintf(output_, "STACK WIN %x %x %x %x %x %x %x %x %x %d ",
-            type, rva, code_size, prolog_size, epilog_size,
-            parameter_size, saved_register_size, local_size, max_stack_size,
-            program_string_result == S_OK);
-    if (program_string_result == S_OK) {
-      fprintf(output_, "%ws\n", program_string);
-    } else {
-      fprintf(output_, "%d\n", allocates_base_pointer);
+    // Only print out a line if type, rva, code_size, or prolog_size have
+    // changed from the last line.  It is surprisingly common (especially in
+    // system library PDBs) for DIA to return a series of identical
+    // IDiaFrameData objects.  For kernel32.pdb from Windows XP SP2 on x86,
+    // this check reduces the size of the dumped symbol file by a third.
+    if (type != last_type || rva != last_rva || code_size != last_code_size ||
+        prolog_size != last_prolog_size) {
+      fprintf(output_, "STACK WIN %x %x %x %x %x %x %x %x %x %d ",
+              type, rva, code_size, prolog_size, epilog_size,
+              parameter_size, saved_register_size, local_size, max_stack_size,
+              program_string_result == S_OK);
+      if (program_string_result == S_OK) {
+        fprintf(output_, "%ws\n", program_string);
+      } else {
+        fprintf(output_, "%d\n", allocates_base_pointer);
+      }
+
+      last_type = type;
+      last_rva = rva;
+      last_code_size = code_size;
+      last_prolog_size = prolog_size;
     }
 
     frame_data.Release();
@@ -390,14 +508,30 @@ bool PDBSourceLineWriter::PrintCodePublicSymbol(IDiaSymbol *symbol) {
 }
 
 bool PDBSourceLineWriter::PrintPDBInfo() {
-  wstring guid, filename;
-  int age;
-  if (!GetModuleInfo(&guid, &age, &filename)) {
+  PDBModuleInfo info;
+  if (!GetModuleInfo(&info)) {
     return false;
   }
 
-  fprintf(output_, "MODULE %ws %x %ws\n", guid.c_str(), age, filename.c_str());
+  // Hard-code "windows" for the OS because that's the only thing that makes
+  // sense for PDB files.  (This might not be strictly correct for Windows CE
+  // support, but we don't care about that at the moment.)
+  fprintf(output_, "MODULE windows %ws %ws %ws\n",
+          info.cpu.c_str(), info.debug_identifier.c_str(),
+          info.debug_file.c_str());
 
+  return true;
+}
+
+bool PDBSourceLineWriter::PrintPEInfo() {
+  PEModuleInfo info;
+  if (!GetPEInfo(&info)) {
+    return false;
+  }
+
+  fprintf(output_, "INFO CODE_ID %ws %ws\n",
+	  info.code_identifier.c_str(),
+	  info.code_file.c_str());
   return true;
 }
 
@@ -436,6 +570,35 @@ static bool wcstol_positive_strict(wchar_t *string, int *result) {
   }
   *result = value;
   return true;
+}
+
+bool PDBSourceLineWriter::FindPEFile() {
+  CComPtr<IDiaSymbol> global;
+  if (FAILED(session_->get_globalScope(&global))) {
+    fprintf(stderr, "get_globalScope failed\n");
+    return false;
+  }
+
+  CComBSTR symbols_file;
+  if (SUCCEEDED(global->get_symbolsFileName(&symbols_file))) {
+    wstring file(symbols_file);
+    
+    // Look for an EXE or DLL file.
+    const wchar_t *extensions[] = { L"exe", L"dll" };
+    for (int i = 0; i < sizeof(extensions) / sizeof(extensions[0]); i++) {
+      size_t dot_pos = file.find_last_of(L".");
+      if (dot_pos != wstring::npos) {
+	file.replace(dot_pos + 1, wstring::npos, extensions[i]);
+	// Check if this file exists.
+	if (GetFileAttributesW(file.c_str()) != INVALID_FILE_ATTRIBUTES) {
+	  code_file_ = file;
+	  return true;
+	}
+      }
+    }
+  }
+
+  return false;
 }
 
 // static
@@ -588,7 +751,8 @@ int PDBSourceLineWriter::GetFunctionStackParamSize(IDiaSymbol *function) {
       goto next_child;
     }
 
-    if (FAILED(child->get_type(&child_type))) {
+    // IDiaSymbol::get_type can succeed but still pass back a NULL value.
+    if (FAILED(child->get_type(&child_type)) || !child_type) {
       goto next_child;
     }
 
@@ -639,10 +803,13 @@ next_child:
 bool PDBSourceLineWriter::WriteMap(FILE *map_file) {
   output_ = map_file;
 
-  bool ret = PrintPDBInfo() &&
-             PrintSourceFiles() && 
-             PrintFunctions() &&
-             PrintFrameData();
+  bool ret = PrintPDBInfo();
+  // This is not a critical piece of the symbol file.
+  PrintPEInfo();
+  ret = ret &&
+    PrintSourceFiles() && 
+    PrintFunctions() &&
+    PrintFrameData();
 
   output_ = NULL;
   return ret;
@@ -652,47 +819,183 @@ void PDBSourceLineWriter::Close() {
   session_.Release();
 }
 
-// static
-wstring PDBSourceLineWriter::GetBaseName(const wstring &filename) {
-  wstring base_name(filename);
-  size_t slash_pos = base_name.find_last_of(L"/\\");
-  if (slash_pos != wstring::npos) {
-    base_name.erase(0, slash_pos + 1);
+bool PDBSourceLineWriter::GetModuleInfo(PDBModuleInfo *info) {
+  if (!info) {
+    return false;
   }
-  return base_name;
-}
 
-bool PDBSourceLineWriter::GetModuleInfo(wstring *guid, int *age,
-                                        wstring *filename) {
-  guid->clear();
-  *age = 0;
-  filename->clear();
+  info->debug_file.clear();
+  info->debug_identifier.clear();
+  info->cpu.clear();
 
   CComPtr<IDiaSymbol> global;
   if (FAILED(session_->get_globalScope(&global))) {
     return false;
   }
 
-  GUID guid_number;
-  if (FAILED(global->get_guid(&guid_number))) {
-    return false;
+  DWORD machine_type;
+  // get_machineType can return S_FALSE.
+  if (global->get_machineType(&machine_type) == S_OK) {
+    // The documentation claims that get_machineType returns a value from
+    // the CV_CPU_TYPE_e enumeration, but that's not the case.
+    // Instead, it returns one of the IMAGE_FILE_MACHINE values as
+    // defined here:
+    // http://msdn.microsoft.com/en-us/library/ms680313%28VS.85%29.aspx
+    switch (machine_type) {
+      case IMAGE_FILE_MACHINE_I386:
+        info->cpu = L"x86";
+        break;
+      case IMAGE_FILE_MACHINE_AMD64:
+        info->cpu = L"x86_64";
+        break;
+      default:
+        info->cpu = L"unknown";
+        break;
+    }
+  } else {
+    // Unexpected, but handle gracefully.
+    info->cpu = L"unknown";
   }
-  *guid = GUIDString::GUIDToWString(&guid_number);
 
   // DWORD* and int* are not compatible.  This is clean and avoids a cast.
-  DWORD age_dword;
-  if (FAILED(global->get_age(&age_dword))) {
+  DWORD age;
+  if (FAILED(global->get_age(&age))) {
     return false;
   }
-  *age = age_dword;
 
-  CComBSTR filename_string;
-  if (FAILED(global->get_symbolsFileName(&filename_string))) {
+  bool uses_guid;
+  if (!UsesGUID(&uses_guid)) {
     return false;
   }
-  *filename = GetBaseName(wstring(filename_string));
+
+  if (uses_guid) {
+    GUID guid;
+    if (FAILED(global->get_guid(&guid))) {
+      return false;
+    }
+
+    // Use the same format that the MS symbol server uses in filesystem
+    // hierarchies.
+    wchar_t age_string[9];
+    swprintf(age_string, sizeof(age_string) / sizeof(age_string[0]),
+             L"%x", age);
+
+    // remove when VC++7.1 is no longer supported
+    age_string[sizeof(age_string) / sizeof(age_string[0]) - 1] = L'\0';
+
+    info->debug_identifier = GUIDString::GUIDToSymbolServerWString(&guid);
+    info->debug_identifier.append(age_string);
+  } else {
+    DWORD signature;
+    if (FAILED(global->get_signature(&signature))) {
+      return false;
+    }
+
+    // Use the same format that the MS symbol server uses in filesystem
+    // hierarchies.
+    wchar_t identifier_string[17];
+    swprintf(identifier_string,
+             sizeof(identifier_string) / sizeof(identifier_string[0]),
+             L"%08X%x", signature, age);
+
+    // remove when VC++7.1 is no longer supported
+    identifier_string[sizeof(identifier_string) /
+                      sizeof(identifier_string[0]) - 1] = L'\0';
+
+    info->debug_identifier = identifier_string;
+  }
+
+  CComBSTR debug_file_string;
+  if (FAILED(global->get_symbolsFileName(&debug_file_string))) {
+    return false;
+  }
+  info->debug_file =
+      WindowsStringUtils::GetBaseName(wstring(debug_file_string));
 
   return true;
 }
 
-}  // namespace google_airbag
+bool PDBSourceLineWriter::GetPEInfo(PEModuleInfo *info) {
+  if (!info) {
+    return false;
+  }
+
+  if (code_file_.empty() && !FindPEFile()) {
+    fprintf(stderr, "Couldn't locate EXE or DLL file.\n");
+    return false;
+  }
+
+  // Convert wchar to native charset because ImageLoad only takes
+  // a PSTR as input.
+  string code_file;
+  if (!WindowsStringUtils::safe_wcstombs(code_file_, &code_file)) {
+    return false;
+  }
+
+  AutoImage img(ImageLoad((PSTR)code_file.c_str(), NULL));
+  if (!img) {
+    fprintf(stderr, "Failed to open PE file: %s\n", code_file.c_str());
+    return false;
+  }
+
+  info->code_file = WindowsStringUtils::GetBaseName(code_file_);
+
+  // The date and time that the file was created by the linker.
+  DWORD TimeDateStamp = img->FileHeader->FileHeader.TimeDateStamp;
+  // The size of the file in bytes, including all headers.
+  DWORD SizeOfImage = 0;
+  PIMAGE_OPTIONAL_HEADER64 opt =
+    &((PIMAGE_NT_HEADERS64)img->FileHeader)->OptionalHeader;
+  if (opt->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+    // 64-bit PE file.
+    SizeOfImage = opt->SizeOfImage;
+  }
+  else {
+    // 32-bit PE file.
+    SizeOfImage = img->FileHeader->OptionalHeader.SizeOfImage;
+  }
+  wchar_t code_identifier[32];
+  swprintf(code_identifier,
+	   sizeof(code_identifier) / sizeof(code_identifier[0]),
+	   L"%08X%X", TimeDateStamp, SizeOfImage);
+  info->code_identifier = code_identifier;
+
+  return true;
+}
+
+bool PDBSourceLineWriter::UsesGUID(bool *uses_guid) {
+  if (!uses_guid)
+    return false;
+
+  CComPtr<IDiaSymbol> global;
+  if (FAILED(session_->get_globalScope(&global)))
+    return false;
+
+  GUID guid;
+  if (FAILED(global->get_guid(&guid)))
+    return false;
+
+  DWORD signature;
+  if (FAILED(global->get_signature(&signature)))
+    return false;
+
+  // There are two possibilities for guid: either it's a real 128-bit GUID
+  // as identified in a code module by a new-style CodeView record, or it's
+  // a 32-bit signature (timestamp) as identified by an old-style record.
+  // See MDCVInfoPDB70 and MDCVInfoPDB20 in minidump_format.h.
+  //
+  // Because DIA doesn't provide a way to directly determine whether a module
+  // uses a GUID or a 32-bit signature, this code checks whether the first 32
+  // bits of guid are the same as the signature, and if the rest of guid is
+  // zero.  If so, then with a pretty high degree of certainty, there's an
+  // old-style CodeView record in use.  This method will only falsely find an
+  // an old-style CodeView record if a real 128-bit GUID has its first 32
+  // bits set the same as the module's signature (timestamp) and the rest of
+  // the GUID is set to 0.  This is highly unlikely.
+
+  GUID signature_guid = {signature};  // 0-initializes other members
+  *uses_guid = !IsEqualGUID(guid, signature_guid);
+  return true;
+}
+
+}  // namespace google_breakpad

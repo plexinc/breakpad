@@ -40,7 +40,10 @@
 
 #include <map>
 
-namespace google_airbag {
+namespace google_breakpad {
+
+// Forward declarations (for later friend declarations).
+template<class, class> class AddressMapSerializer;
 
 template<typename AddressType, typename EntryType>
 class AddressMap {
@@ -53,8 +56,8 @@ class AddressMap {
   bool Store(const AddressType &address, const EntryType &entry);
 
   // Locates the entry stored at the highest address less than or equal to
-  // the address argument.  If there is no such range, or if there is a
-  // parameter error, returns false.  The entry is returned in entry.  If
+  // the address argument.  If there is no such range, returns false.  The
+  // entry is returned in entry, which is a required argument.  If
   // entry_address is not NULL, it will be set to the address that the entry
   // was stored at.
   bool Retrieve(const AddressType &address,
@@ -65,6 +68,9 @@ class AddressMap {
   void Clear();
 
  private:
+  friend class AddressMapSerializer<AddressType, EntryType>;
+  friend class ModuleComparer;
+
   // Convenience types.
   typedef std::map<AddressType, EntryType> AddressToEntryMap;
   typedef typename AddressToEntryMap::const_iterator MapConstIterator;
@@ -74,7 +80,6 @@ class AddressMap {
   AddressToEntryMap map_;
 };
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 #endif  // PROCESSOR_ADDRESS_MAP_H__
-

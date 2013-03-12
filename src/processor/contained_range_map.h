@@ -64,8 +64,10 @@
 #include <map>
 
 
-namespace google_airbag {
+namespace google_breakpad {
 
+// Forward declarations (for later friend declarations of specialized template).
+template<class, class> class ContainedRangeMapSerializer;
 
 template<typename AddressType, typename EntryType>
 class ContainedRangeMap {
@@ -92,8 +94,7 @@ class ContainedRangeMap {
   // the specified address.  This method will only return entries held by
   // child ranges, and not the entry contained by |this|.  This is necessary
   // to support a sparsely-populated root range.  If no descendant range
-  // encompasses the address, or if there is a parameter error, returns
-  // false.
+  // encompasses the address, returns false.
   bool RetrieveRange(const AddressType &address, EntryType *entry) const;
 
   // Removes all children.  Note that Clear only removes descendants,
@@ -104,6 +105,9 @@ class ContainedRangeMap {
   void Clear();
 
  private:
+  friend class ContainedRangeMapSerializer<AddressType, EntryType>;
+  friend class ModuleComparer;
+
   // AddressToRangeMap stores pointers.  This makes reparenting simpler in
   // StoreRange, because it doesn't need to copy entire objects.
   typedef std::map<AddressType, ContainedRangeMap *> AddressToRangeMap;
@@ -140,7 +144,7 @@ class ContainedRangeMap {
 };
 
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 
 #endif  // PROCESSOR_CONTAINED_RANGE_MAP_H__

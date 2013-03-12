@@ -36,9 +36,9 @@
 
 #include <string>
 
-namespace google_airbag {
+#include "common/using_std_string.h"
 
-using std::string;
+namespace google_breakpad {
 
 class PathnameStripper {
  public:
@@ -48,6 +48,6 @@ class PathnameStripper {
   static string File(const string &path);
 };
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 #endif  // PROCESSOR_PATHNAME_STRIPPER_H__

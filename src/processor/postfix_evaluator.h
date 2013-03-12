@@ -1,16 +1,33 @@
-// Copyright (C) 2006 Google Inc.
+// -*- mode: C++ -*-
+
+// Copyright (c) 2010 Google Inc.
+// All rights reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // postfix_evaluator.h: Postfix (reverse Polish) notation expression evaluator.
 //
@@ -27,10 +44,12 @@
 // either literal values suitable for ValueType, or constants or variables,
 // which reference the dictionary.  The supported binary operators are +
 // (addition), - (subtraction), * (multiplication), / (quotient of division),
-// and % (modulus of division).  The unary ^ (dereference) operator is also
-// provided.  These operators allow any operand to be either a literal
-// value, constant, or variable.  Assignment (=) of any type of operand into
-// a variable is also supported.
+// % (modulus of division), and @ (data alignment). The alignment operator (@)
+// accepts a value and an alignment size, and produces a result that is a
+// multiple of the alignment size by truncating the input value.
+// The unary ^ (dereference) operator is also provided.  These operators
+// allow any operand to be either a literal value, constant, or variable.
+// Assignment (=) of any type of operand into a variable is also supported.
 //
 // The dictionary is provided as a map with string keys.  Keys beginning
 // with the '$' character are treated as variables.  All other keys are
@@ -55,10 +74,11 @@
 #include <string>
 #include <vector>
 
-namespace google_airbag {
+#include "common/using_std_string.h"
+
+namespace google_breakpad {
 
 using std::map;
-using std::string;
 using std::vector;
 
 class MemoryRegion;
@@ -75,17 +95,23 @@ class PostfixEvaluator {
   // (^) will not be supported.  |dictionary| may be NULL, but evaluation
   // will fail in that case unless set_dictionary is used before calling
   // Evaluate.
-  PostfixEvaluator(DictionaryType *dictionary, MemoryRegion *memory)
+  PostfixEvaluator(DictionaryType *dictionary, const MemoryRegion *memory)
       : dictionary_(dictionary), memory_(memory), stack_() {}
 
-  // Evaluate the expression.  The results of execution will be stored
-  // in one (or more) variables in the dictionary.  Returns false if any
-  // failures occure during execution, leaving variables in the dictionary
-  // in an indeterminate state.  If assigned is non-NULL, any keys set in
-  // the dictionary as a result of evaluation will also be set to true in
-  // assigned, providing a way to determine if an expression modifies any
-  // of its input variables.
+  // Evaluate the expression, starting with an empty stack. The results of
+  // execution will be stored in one (or more) variables in the dictionary.
+  // Returns false if any failures occur during execution, leaving
+  // variables in the dictionary in an indeterminate state. If assigned is
+  // non-NULL, any keys set in the dictionary as a result of evaluation
+  // will also be set to true in assigned, providing a way to determine if
+  // an expression modifies any of its input variables.
   bool Evaluate(const string &expression, DictionaryValidityType *assigned);
+
+  // Like Evaluate, but provides the value left on the stack to the
+  // caller. If evaluation succeeds and leaves exactly one value on
+  // the stack, pop that value, store it in *result, and return true.
+  // Otherwise, return false.
+  bool EvaluateForValue(const string &expression, ValueType *result);
 
   DictionaryType* dictionary() const { return dictionary_; }
 
@@ -122,6 +148,16 @@ class PostfixEvaluator {
   // Pushes a new value onto the stack.
   void PushValue(const ValueType &value);
 
+  // Evaluate expression, updating *assigned if it is non-zero. Return
+  // true if evaluation completes successfully. Do not clear the stack
+  // upon successful evaluation.
+  bool EvaluateInternal(const string &expression,
+                        DictionaryValidityType *assigned);
+
+  bool EvaluateToken(const string &token,
+                     const string &expression,
+                     DictionaryValidityType *assigned);
+
   // The dictionary mapping constant and variable identifiers (strings) to
   // values.  Keys beginning with '$' are treated as variable names, and
   // PostfixEvaluator is free to create and modify these keys.  Weak pointer.
@@ -129,7 +165,7 @@ class PostfixEvaluator {
 
   // If non-NULL, the MemoryRegion used for dereference (^) operations.
   // If NULL, dereferencing is unsupported and will fail.  Weak pointer.
-  MemoryRegion *memory_;
+  const MemoryRegion *memory_;
 
   // The stack contains state information as execution progresses.  Values
   // are pushed on to it as the expression string is read and as operations
@@ -137,7 +173,7 @@ class PostfixEvaluator {
   vector<string> stack_;
 };
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 
 #endif  // PROCESSOR_POSTFIX_EVALUATOR_H__

@@ -1,4 +1,4 @@
-// Copyright (c) 2006, Google Inc.
+// Copyright (c) 2010 Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -35,49 +35,57 @@
 
 
 #include "processor/stackwalker_ppc.h"
-#include "google_airbag/processor/call_stack.h"
-#include "google_airbag/processor/minidump.h"
-#include "google_airbag/processor/stack_frame_cpu.h"
+#include "google_breakpad/processor/call_stack.h"
+#include "google_breakpad/processor/memory_region.h"
+#include "google_breakpad/processor/stack_frame_cpu.h"
+#include "processor/logging.h"
 
-namespace google_airbag {
+namespace google_breakpad {
 
 
-StackwalkerPPC::StackwalkerPPC(const MDRawContextPPC *context,
-                               MemoryRegion *memory,
-                               MinidumpModuleList *modules,
-                               SymbolSupplier *supplier)
-    : Stackwalker(memory, modules, supplier),
+StackwalkerPPC::StackwalkerPPC(const SystemInfo* system_info,
+                               const MDRawContextPPC* context,
+                               MemoryRegion* memory,
+                               const CodeModules* modules,
+                               StackFrameSymbolizer* resolver_helper)
+    : Stackwalker(system_info, memory, modules, resolver_helper),
       context_(context) {
-  if (memory_->GetBase() + memory_->GetSize() - 1 > 0xffffffff) {
+  if (memory_ && memory_->GetBase() + memory_->GetSize() - 1 > 0xffffffff) {
     // This implementation only covers 32-bit ppc CPUs.  The limits of the
     // supplied stack are invalid.  Mark memory_ = NULL, which will cause
     // stackwalking to fail.
+    BPLOG(ERROR) << "Memory out of range for stackwalking: " <<
+                    HexString(memory_->GetBase()) << "+" <<
+                    HexString(memory_->GetSize());
     memory_ = NULL;
   }
 }
 
 
 StackFrame* StackwalkerPPC::GetContextFrame() {
-  if (!context_ || !memory_)
+  if (!context_) {
+    BPLOG(ERROR) << "Can't get context frame without context";
     return NULL;
+  }
 
-  StackFramePPC *frame = new StackFramePPC();
+  StackFramePPC* frame = new StackFramePPC();
 
   // The instruction pointer is stored directly in a register, so pull it
   // straight out of the CPU context structure.
   frame->context = *context_;
   frame->context_validity = StackFramePPC::CONTEXT_VALID_ALL;
+  frame->trust = StackFrame::FRAME_TRUST_CONTEXT;
   frame->instruction = frame->context.srr0;
 
   return frame;
 }
 
 
-StackFrame* StackwalkerPPC::GetCallerFrame(
-    const CallStack *stack,
-    const vector< linked_ptr<StackFrameInfo> > &stack_frame_info) {
-  if (!memory_ || !stack)
+StackFrame* StackwalkerPPC::GetCallerFrame(const CallStack* stack) {
+  if (!memory_ || !stack) {
+    BPLOG(ERROR) << "Can't get caller frame without memory or stack";
     return NULL;
+  }
 
   // The instruction pointers for previous frames are saved on the stack.
   // The typical ppc calling convention is for the called procedure to store
@@ -88,13 +96,13 @@ StackFrame* StackwalkerPPC::GetCallerFrame(
   // frame pointer, and what is typically thought of as the frame pointer on
   // an x86 is usually referred to as the stack pointer on a ppc.
 
-  StackFramePPC *last_frame = static_cast<StackFramePPC*>(
+  StackFramePPC* last_frame = static_cast<StackFramePPC*>(
       stack->frames()->back());
 
   // A caller frame must reside higher in memory than its callee frames.
   // Anything else is an error, or an indication that we've reached the
   // end of the stack.
-  u_int32_t stack_pointer;
+  uint32_t stack_pointer;
   if (!memory_->GetMemoryAtAddress(last_frame->context.gpr[1],
                                    &stack_pointer) ||
       stack_pointer <= last_frame->context.gpr[1]) {
@@ -106,19 +114,20 @@ StackFrame* StackwalkerPPC::GetCallerFrame(
   // documentation on this, but 0 or 1 would be bogus return addresses,
   // so check for them here and return false (end of stack) when they're
   // hit to avoid having a phantom frame.
-  u_int32_t instruction;
+  uint32_t instruction;
   if (!memory_->GetMemoryAtAddress(stack_pointer + 8, &instruction) ||
       instruction <= 1) {
     return NULL;
   }
 
-  StackFramePPC *frame = new StackFramePPC();
+  StackFramePPC* frame = new StackFramePPC();
 
   frame->context = last_frame->context;
   frame->context.srr0 = instruction;
   frame->context.gpr[1] = stack_pointer;
   frame->context_validity = StackFramePPC::CONTEXT_VALID_SRR0 |
                             StackFramePPC::CONTEXT_VALID_GPR1;
+  frame->trust = StackFrame::FRAME_TRUST_FP;
 
   // frame->context.srr0 is the return address, which is one instruction
   // past the branch that caused us to arrive at the callee.  Set
@@ -133,4 +142,4 @@ StackFrame* StackwalkerPPC::GetCallerFrame(
 }
 
 
-}  // namespace google_airbag
+}  // namespace google_breakpad

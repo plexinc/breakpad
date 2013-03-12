@@ -28,31 +28,41 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This file is used to generate minidump2.dmp and minidump2.sym.
-// cl /Zi test_app.cc /Fetest_app.exe /I airbag/src \
-//   airbag/src/client/windows/releasestaticcrt/exception_handler.lib \
-//   ole32.lib
+// cl /Zi test_app.cc /Fetest_app.exe /I google_breakpad/src \
+//   google_breakpad/src/client/windows/releasestaticcrt/exception_handler.lib
 // Then run test_app to generate a dump, and dump_syms to create the .sym file.
 
-#include <cstdio>
+#include <stdio.h>
 
 #include "client/windows/handler/exception_handler.h"
 
-void callback(const std::wstring &id, void *context, bool succeeded) {
+namespace {
+
+static bool callback(const wchar_t *dump_path, const wchar_t *id,
+                     void *context, EXCEPTION_POINTERS *exinfo,
+                     MDRawAssertionInfo *assertion,
+                     bool succeeded) {
   if (succeeded) {
-    printf("dump guid is %ws\n", id.c_str());
+    printf("dump guid is %ws\n", id);
   } else {
     printf("dump failed\n");
   }
-  exit(1);
+  fflush(stdout);
+
+  return succeeded;
 }
 
-void CrashFunction() {
+static void CrashFunction() {
   int *i = reinterpret_cast<int*>(0x45);
   *i = 5;  // crash!
 }
 
+}  // namespace
+
 int main(int argc, char **argv) {
-  google_airbag::ExceptionHandler eh(L".", callback, NULL, true);
+  google_breakpad::ExceptionHandler eh(
+      L".", NULL, callback, NULL,
+      google_breakpad::ExceptionHandler::HANDLER_ALL);
   CrashFunction();
   printf("did not crash?\n");
   return 0;

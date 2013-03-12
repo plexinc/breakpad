@@ -27,73 +27,143 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google_airbag/processor/minidump_processor.h"
-#include "google_airbag/processor/call_stack.h"
-#include "google_airbag/processor/minidump.h"
-#include "google_airbag/processor/process_state.h"
-#include "processor/scoped_ptr.h"
+#include "google_breakpad/processor/minidump_processor.h"
+
+#include <assert.h>
+#include <stdio.h>
+
+#include "common/scoped_ptr.h"
+#include "google_breakpad/processor/call_stack.h"
+#include "google_breakpad/processor/minidump.h"
+#include "google_breakpad/processor/process_state.h"
+#include "google_breakpad/processor/exploitability.h"
+#include "google_breakpad/processor/stack_frame_symbolizer.h"
+#include "processor/logging.h"
 #include "processor/stackwalker_x86.h"
 
-namespace google_airbag {
+namespace google_breakpad {
 
-MinidumpProcessor::MinidumpProcessor(SymbolSupplier *supplier)
-    : supplier_(supplier) {
+MinidumpProcessor::MinidumpProcessor(SymbolSupplier *supplier,
+                                     SourceLineResolverInterface *resolver)
+    : frame_symbolizer_(new StackFrameSymbolizer(supplier, resolver)),
+      own_frame_symbolizer_(true),
+      enable_exploitability_(false) {
+}
+
+MinidumpProcessor::MinidumpProcessor(SymbolSupplier *supplier,
+                                     SourceLineResolverInterface *resolver,
+                                     bool enable_exploitability)
+    : frame_symbolizer_(new StackFrameSymbolizer(supplier, resolver)),
+      own_frame_symbolizer_(true),
+      enable_exploitability_(enable_exploitability) {
+}
+
+MinidumpProcessor::MinidumpProcessor(StackFrameSymbolizer *frame_symbolizer,
+                                     bool enable_exploitability)
+    : frame_symbolizer_(frame_symbolizer),
+      own_frame_symbolizer_(false),
+      enable_exploitability_(enable_exploitability) {
+  assert(frame_symbolizer_);
 }
 
 MinidumpProcessor::~MinidumpProcessor() {
+  if (own_frame_symbolizer_) delete frame_symbolizer_;
 }
 
-ProcessState* MinidumpProcessor::Process(const string &minidump_file) {
-  Minidump dump(minidump_file);
-  if (!dump.Read()) {
-    return NULL;
+ProcessResult MinidumpProcessor::Process(
+    Minidump *dump, ProcessState *process_state) {
+  assert(dump);
+  assert(process_state);
+
+  process_state->Clear();
+
+  const MDRawHeader *header = dump->header();
+  if (!header) {
+    BPLOG(ERROR) << "Minidump " << dump->path() << " has no header";
+    return PROCESS_ERROR_NO_MINIDUMP_HEADER;
   }
+  process_state->time_date_stamp_ = header->time_date_stamp;
 
-  scoped_ptr<ProcessState> process_state(new ProcessState());
+  bool has_cpu_info = GetCPUInfo(dump, &process_state->system_info_);
+  bool has_os_info = GetOSInfo(dump, &process_state->system_info_);
 
-  process_state->cpu_ = GetCPUInfo(&dump, &process_state->cpu_info_);
-  process_state->os_ = GetOSInfo(&dump, &process_state->os_version_);
-
-  u_int32_t dump_thread_id = 0;
+  uint32_t dump_thread_id = 0;
   bool has_dump_thread = false;
-  u_int32_t requesting_thread_id = 0;
+  uint32_t requesting_thread_id = 0;
   bool has_requesting_thread = false;
 
-  MinidumpAirbagInfo *airbag_info = dump.GetAirbagInfo();
-  if (airbag_info) {
-    has_dump_thread = airbag_info->GetDumpThreadID(&dump_thread_id);
+  MinidumpBreakpadInfo *breakpad_info = dump->GetBreakpadInfo();
+  if (breakpad_info) {
+    has_dump_thread = breakpad_info->GetDumpThreadID(&dump_thread_id);
     has_requesting_thread =
-        airbag_info->GetRequestingThreadID(&requesting_thread_id);
+        breakpad_info->GetRequestingThreadID(&requesting_thread_id);
   }
 
-  MinidumpException *exception = dump.GetException();
+  MinidumpException *exception = dump->GetException();
   if (exception) {
     process_state->crashed_ = true;
     has_requesting_thread = exception->GetThreadID(&requesting_thread_id);
 
     process_state->crash_reason_ = GetCrashReason(
-        &dump, &process_state->crash_address_);
+        dump, &process_state->crash_address_);
   }
 
-  MinidumpThreadList *threads = dump.GetThreadList();
+  // This will just return an empty string if it doesn't exist.
+  process_state->assertion_ = GetAssertion(dump);
+
+  MinidumpModuleList *module_list = dump->GetModuleList();
+
+  // Put a copy of the module list into ProcessState object.  This is not
+  // necessarily a MinidumpModuleList, but it adheres to the CodeModules
+  // interface, which is all that ProcessState needs to expose.
+  if (module_list)
+    process_state->modules_ = module_list->Copy();
+
+  MinidumpThreadList *threads = dump->GetThreadList();
   if (!threads) {
-    return NULL;
+    BPLOG(ERROR) << "Minidump " << dump->path() << " has no thread list";
+    return PROCESS_ERROR_NO_THREAD_LIST;
   }
 
+  BPLOG(INFO) << "Minidump " << dump->path() << " has " <<
+      (has_cpu_info           ? "" : "no ") << "CPU info, " <<
+      (has_os_info            ? "" : "no ") << "OS info, " <<
+      (breakpad_info != NULL  ? "" : "no ") << "Breakpad info, " <<
+      (exception != NULL      ? "" : "no ") << "exception, " <<
+      (module_list != NULL    ? "" : "no ") << "module list, " <<
+      (threads != NULL        ? "" : "no ") << "thread list, " <<
+      (has_dump_thread        ? "" : "no ") << "dump thread, and " <<
+      (has_requesting_thread  ? "" : "no ") << "requesting thread";
+
+  bool interrupted = false;
   bool found_requesting_thread = false;
   unsigned int thread_count = threads->thread_count();
+
+  // Reset frame_symbolizer_ at the beginning of stackwalk for each minidump.
+  frame_symbolizer_->Reset();
+
   for (unsigned int thread_index = 0;
        thread_index < thread_count;
        ++thread_index) {
+    char thread_string_buffer[64];
+    snprintf(thread_string_buffer, sizeof(thread_string_buffer), "%d/%d",
+             thread_index, thread_count);
+    string thread_string = dump->path() + ":" + thread_string_buffer;
+
     MinidumpThread *thread = threads->GetThreadAtIndex(thread_index);
     if (!thread) {
-      return NULL;
+      BPLOG(ERROR) << "Could not get thread for " << thread_string;
+      return PROCESS_ERROR_GETTING_THREAD;
     }
 
-    u_int32_t thread_id;
+    uint32_t thread_id;
     if (!thread->GetThreadID(&thread_id)) {
-      return NULL;
+      BPLOG(ERROR) << "Could not get thread ID for " << thread_string;
+      return PROCESS_ERROR_GETTING_THREAD_ID;
     }
+
+    thread_string += " id " + HexString(thread_id);
+    BPLOG(INFO) << "Looking at thread " << thread_string;
 
     // If this thread is the thread that produced the minidump, don't process
     // it.  Because of the problems associated with a thread producing a
@@ -108,7 +178,8 @@ ProcessState* MinidumpProcessor::Process(const string &minidump_file) {
     if (has_requesting_thread && thread_id == requesting_thread_id) {
       if (found_requesting_thread) {
         // There can't be more than one requesting thread.
-        return NULL;
+        BPLOG(ERROR) << "Duplicate requesting thread: " << thread_string;
+        return PROCESS_ERROR_DUPLICATE_REQUESTING_THREADS;
       }
 
       // Use processed_state->threads_.size() instead of thread_index.
@@ -127,39 +198,96 @@ ProcessState* MinidumpProcessor::Process(const string &minidump_file) {
         // of the thread's own context.  For the crashed thread, the thread's
         // own context is the state inside the exception handler.  Using it
         // would not result in the expected stack trace from the time of the
-        // crash.
-        context = exception->GetContext();
+        // crash. If the exception context is invalid, however, we fall back
+        // on the thread context.
+        MinidumpContext *ctx = exception->GetContext();
+        context = ctx ? ctx : thread->GetContext();
       }
     }
 
     MinidumpMemoryRegion *thread_memory = thread->GetMemory();
     if (!thread_memory) {
-      return NULL;
+      BPLOG(ERROR) << "No memory region for " << thread_string;
     }
 
+    // Use process_state->modules_ instead of module_list, because the
+    // |modules| argument will be used to populate the |module| fields in
+    // the returned StackFrame objects, which will be placed into the
+    // returned ProcessState object.  module_list's lifetime is only as
+    // long as the Minidump object: it will be deleted when this function
+    // returns.  process_state->modules_ is owned by the ProcessState object
+    // (just like the StackFrame objects), and is much more suitable for this
+    // task.
     scoped_ptr<Stackwalker> stackwalker(
-        Stackwalker::StackwalkerForCPU(context,
+        Stackwalker::StackwalkerForCPU(process_state->system_info(),
+                                       context,
                                        thread_memory,
-                                       dump.GetModuleList(),
-                                       supplier_));
-    if (!stackwalker.get()) {
-      return NULL;
-    }
+                                       process_state->modules_,
+                                       frame_symbolizer_));
 
-    scoped_ptr<CallStack> stack(stackwalker->Walk());
-    if (!stack.get()) {
-      return NULL;
+    scoped_ptr<CallStack> stack(new CallStack());
+    if (stackwalker.get()) {
+      if (!stackwalker->Walk(stack.get(),
+                             &process_state->modules_without_symbols_)) {
+        BPLOG(INFO) << "Stackwalker interrupt (missing symbols?) at "
+                    << thread_string;
+        interrupted = true;
+      }
+    } else {
+      // Threads with missing CPU contexts will hit this, but
+      // don't abort processing the rest of the dump just for
+      // one bad thread.
+      BPLOG(ERROR) << "No stackwalker for " << thread_string;
     }
-
     process_state->threads_.push_back(stack.release());
+    process_state->thread_memory_regions_.push_back(thread_memory);
+  }
+
+  if (interrupted) {
+    BPLOG(INFO) << "Processing interrupted for " << dump->path();
+    return PROCESS_SYMBOL_SUPPLIER_INTERRUPTED;
   }
 
   // If a requesting thread was indicated, it must be present.
   if (has_requesting_thread && !found_requesting_thread) {
-    return NULL;
+    // Don't mark as an error, but invalidate the requesting thread
+    BPLOG(ERROR) << "Minidump indicated requesting thread " <<
+        HexString(requesting_thread_id) << ", not found in " <<
+        dump->path();
+    process_state->requesting_thread_ = -1;
   }
 
-  return process_state.release();
+  // Exploitability defaults to EXPLOITABILITY_NOT_ANALYZED
+  process_state->exploitability_ = EXPLOITABILITY_NOT_ANALYZED;
+
+  // If an exploitability run was requested we perform the platform specific
+  // rating.
+  if (enable_exploitability_) {
+    scoped_ptr<Exploitability> exploitability(
+        Exploitability::ExploitabilityForPlatform(dump, process_state));
+    // The engine will be null if the platform is not supported
+    if (exploitability != NULL) {
+      process_state->exploitability_ = exploitability->CheckExploitability();
+    } else {
+      process_state->exploitability_ = EXPLOITABILITY_ERR_NOENGINE;
+    }
+  }
+
+  BPLOG(INFO) << "Processed " << dump->path();
+  return PROCESS_OK;
+}
+
+ProcessResult MinidumpProcessor::Process(
+    const string &minidump_file, ProcessState *process_state) {
+  BPLOG(INFO) << "Processing minidump in file " << minidump_file;
+
+  Minidump dump(minidump_file);
+  if (!dump.Read()) {
+     BPLOG(ERROR) << "Minidump " << dump.path() << " could not be read";
+     return PROCESS_ERROR_MINIDUMP_NOT_FOUND;
+  }
+
+  return Process(&dump, process_state);
 }
 
 // Returns the MDRawSystemInfo from a minidump, or NULL if system info is
@@ -178,38 +306,54 @@ static const MDRawSystemInfo* GetSystemInfo(Minidump *dump,
 }
 
 // static
-string MinidumpProcessor::GetCPUInfo(Minidump *dump, string *cpu_info) {
-  if (cpu_info)
-    cpu_info->clear();
+bool MinidumpProcessor::GetCPUInfo(Minidump *dump, SystemInfo *info) {
+  assert(dump);
+  assert(info);
+
+  info->cpu.clear();
+  info->cpu_info.clear();
 
   MinidumpSystemInfo *system_info;
   const MDRawSystemInfo *raw_system_info = GetSystemInfo(dump, &system_info);
   if (!raw_system_info)
-    return "";
+    return false;
 
-  string cpu;
   switch (raw_system_info->processor_architecture) {
-    case MD_CPU_ARCHITECTURE_X86: {
-      cpu = "x86";
-      if (cpu_info) {
-        const string *cpu_vendor = system_info->GetCPUVendor();
-        if (cpu_vendor) {
-          cpu_info->assign(*cpu_vendor);
-          cpu_info->append(" ");
-        }
+    case MD_CPU_ARCHITECTURE_X86:
+    case MD_CPU_ARCHITECTURE_AMD64: {
+      if (raw_system_info->processor_architecture ==
+          MD_CPU_ARCHITECTURE_X86)
+        info->cpu = "x86";
+      else
+        info->cpu = "amd64";
 
-        char x86_info[36];
-        snprintf(x86_info, sizeof(x86_info), "family %u model %u stepping %u",
-                 raw_system_info->processor_level,
-                 raw_system_info->processor_revision >> 8,
-                 raw_system_info->processor_revision & 0xff);
-        cpu_info->append(x86_info);
+      const string *cpu_vendor = system_info->GetCPUVendor();
+      if (cpu_vendor) {
+        info->cpu_info = *cpu_vendor;
+        info->cpu_info.append(" ");
       }
+
+      char x86_info[36];
+      snprintf(x86_info, sizeof(x86_info), "family %u model %u stepping %u",
+               raw_system_info->processor_level,
+               raw_system_info->processor_revision >> 8,
+               raw_system_info->processor_revision & 0xff);
+      info->cpu_info.append(x86_info);
       break;
     }
 
     case MD_CPU_ARCHITECTURE_PPC: {
-      cpu = "ppc";
+      info->cpu = "ppc";
+      break;
+    }
+
+    case MD_CPU_ARCHITECTURE_SPARC: {
+      info->cpu = "sparc";
+      break;
+    }
+
+    case MD_CPU_ARCHITECTURE_ARM: {
+      info->cpu = "arm";
       break;
     }
 
@@ -218,43 +362,65 @@ string MinidumpProcessor::GetCPUInfo(Minidump *dump, string *cpu_info) {
       char cpu_string[7];
       snprintf(cpu_string, sizeof(cpu_string), "0x%04x",
                raw_system_info->processor_architecture);
-      cpu = cpu_string;
+      info->cpu = cpu_string;
       break;
     }
   }
 
-  return cpu;
+  info->cpu_count = raw_system_info->number_of_processors;
+
+  return true;
 }
 
 // static
-string MinidumpProcessor::GetOSInfo(Minidump *dump, string *os_version) {
-  if (os_version)
-    os_version->clear();
+bool MinidumpProcessor::GetOSInfo(Minidump *dump, SystemInfo *info) {
+  assert(dump);
+  assert(info);
+
+  info->os.clear();
+  info->os_short.clear();
+  info->os_version.clear();
 
   MinidumpSystemInfo *system_info;
   const MDRawSystemInfo *raw_system_info = GetSystemInfo(dump, &system_info);
   if (!raw_system_info)
-    return "";
+    return false;
 
-  string os;
+  info->os_short = system_info->GetOS();
+
   switch (raw_system_info->platform_id) {
     case MD_OS_WIN32_NT: {
-      os = "Windows NT";
+      info->os = "Windows NT";
       break;
     }
 
     case MD_OS_WIN32_WINDOWS: {
-      os = "Windows";
+      info->os = "Windows";
       break;
     }
 
     case MD_OS_MAC_OS_X: {
-      os = "Mac OS X";
+      info->os = "Mac OS X";
+      break;
+    }
+
+    case MD_OS_IOS: {
+      info->os = "iOS";
       break;
     }
 
     case MD_OS_LINUX: {
-      os = "Linux";
+      info->os = "Linux";
+      break;
+    }
+
+    case MD_OS_SOLARIS: {
+      info->os = "Solaris";
+      break;
+    }
+
+    case MD_OS_ANDROID: {
+      info->os = "Android";
       break;
     }
 
@@ -263,31 +429,29 @@ string MinidumpProcessor::GetOSInfo(Minidump *dump, string *os_version) {
       char os_string[11];
       snprintf(os_string, sizeof(os_string), "0x%08x",
                raw_system_info->platform_id);
-      os = os_string;
+      info->os = os_string;
       break;
     }
   }
 
-  if (os_version) {
-    char os_version_string[33];
-    snprintf(os_version_string, sizeof(os_version_string), "%u.%u.%u",
-             raw_system_info->major_version,
-             raw_system_info->minor_version,
-             raw_system_info->build_number);
-    os_version->assign(os_version_string);
+  char os_version_string[33];
+  snprintf(os_version_string, sizeof(os_version_string), "%u.%u.%u",
+           raw_system_info->major_version,
+           raw_system_info->minor_version,
+           raw_system_info->build_number);
+  info->os_version = os_version_string;
 
-    const string *csd_version = system_info->GetCSDVersion();
-    if (csd_version) {
-      os_version->append(" ");
-      os_version->append(*csd_version);
-    }
+  const string *csd_version = system_info->GetCSDVersion();
+  if (csd_version) {
+    info->os_version.append(" ");
+    info->os_version.append(*csd_version);
   }
 
-  return os;
+  return true;
 }
 
 // static
-string MinidumpProcessor::GetCrashReason(Minidump *dump, u_int64_t *address) {
+string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
   MinidumpException *exception = dump->GetException();
   if (!exception)
     return "";
@@ -304,9 +468,10 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, u_int64_t *address) {
   // map the codes to a string (because there's no system info, or because
   // it's an unrecognized platform, or because it's an unrecognized code.)
   char reason_string[24];
+  uint32_t exception_code = raw_exception->exception_record.exception_code;
+  uint32_t exception_flags = raw_exception->exception_record.exception_flags;
   snprintf(reason_string, sizeof(reason_string), "0x%08x / 0x%08x",
-           raw_exception->exception_record.exception_code,
-           raw_exception->exception_record.exception_flags);
+           exception_code, exception_flags);
   string reason = reason_string;
 
   const MDRawSystemInfo *raw_system_info = GetSystemInfo(dump, NULL);
@@ -314,9 +479,321 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, u_int64_t *address) {
     return reason;
 
   switch (raw_system_info->platform_id) {
+    case MD_OS_MAC_OS_X:
+    case MD_OS_IOS: {
+      char flags_string[11];
+      snprintf(flags_string, sizeof(flags_string), "0x%08x", exception_flags);
+      switch (exception_code) {
+        case MD_EXCEPTION_MAC_BAD_ACCESS:
+          reason = "EXC_BAD_ACCESS / ";
+          switch (exception_flags) {
+            case MD_EXCEPTION_CODE_MAC_INVALID_ADDRESS:
+              reason.append("KERN_INVALID_ADDRESS");
+              break;
+            case MD_EXCEPTION_CODE_MAC_PROTECTION_FAILURE:
+              reason.append("KERN_PROTECTION_FAILURE");
+              break;
+            case MD_EXCEPTION_CODE_MAC_NO_ACCESS:
+              reason.append("KERN_NO_ACCESS");
+              break;
+            case MD_EXCEPTION_CODE_MAC_MEMORY_FAILURE:
+              reason.append("KERN_MEMORY_FAILURE");
+              break;
+            case MD_EXCEPTION_CODE_MAC_MEMORY_ERROR:
+              reason.append("KERN_MEMORY_ERROR");
+              break;
+            default:
+              // arm and ppc overlap
+              if (raw_system_info->processor_architecture ==
+                  MD_CPU_ARCHITECTURE_ARM) {
+                switch (exception_flags) {
+                  case MD_EXCEPTION_CODE_MAC_ARM_DA_ALIGN:
+                    reason.append("EXC_ARM_DA_ALIGN");
+                    break;
+                  case MD_EXCEPTION_CODE_MAC_ARM_DA_DEBUG:
+                    reason.append("EXC_ARM_DA_DEBUG");
+                    break;
+                  default:
+                    reason.append(flags_string);
+                    BPLOG(INFO) << "Unknown exception reason " << reason;
+                    break;
+                }
+              } else if (raw_system_info->processor_architecture ==
+                         MD_CPU_ARCHITECTURE_PPC) {
+                switch (exception_flags) {
+                  case MD_EXCEPTION_CODE_MAC_PPC_VM_PROT_READ:
+                    reason.append("EXC_PPC_VM_PROT_READ");
+                    break;
+                  case MD_EXCEPTION_CODE_MAC_PPC_BADSPACE:
+                    reason.append("EXC_PPC_BADSPACE");
+                    break;
+                  case MD_EXCEPTION_CODE_MAC_PPC_UNALIGNED:
+                    reason.append("EXC_PPC_UNALIGNED");
+                    break;
+                  default:
+                    reason.append(flags_string);
+                    BPLOG(INFO) << "Unknown exception reason " << reason;
+                    break;
+                }
+              } else {
+                reason.append(flags_string);
+                BPLOG(INFO) << "Unknown exception reason " << reason;
+              }
+              break;
+          }
+          break;
+        case MD_EXCEPTION_MAC_BAD_INSTRUCTION:
+          reason = "EXC_BAD_INSTRUCTION / ";
+          switch (raw_system_info->processor_architecture) {
+            case MD_CPU_ARCHITECTURE_ARM: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_ARM_UNDEFINED:
+                  reason.append("EXC_ARM_UNDEFINED");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            case MD_CPU_ARCHITECTURE_PPC: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_PPC_INVALID_SYSCALL:
+                  reason.append("EXC_PPC_INVALID_SYSCALL");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_UNIMPLEMENTED_INSTRUCTION:
+                  reason.append("EXC_PPC_UNIPL_INST");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_PRIVILEGED_INSTRUCTION:
+                  reason.append("EXC_PPC_PRIVINST");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_PRIVILEGED_REGISTER:
+                  reason.append("EXC_PPC_PRIVREG");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_TRACE:
+                  reason.append("EXC_PPC_TRACE");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_PERFORMANCE_MONITOR:
+                  reason.append("EXC_PPC_PERFMON");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            case MD_CPU_ARCHITECTURE_X86: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_X86_INVALID_OPERATION:
+                  reason.append("EXC_I386_INVOP");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_INVALID_TASK_STATE_SEGMENT:
+                  reason.append("EXC_INVTSSFLT");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_SEGMENT_NOT_PRESENT:
+                  reason.append("EXC_SEGNPFLT");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_STACK_FAULT:
+                  reason.append("EXC_STKFLT");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_GENERAL_PROTECTION_FAULT:
+                  reason.append("EXC_GPFLT");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_ALIGNMENT_FAULT:
+                  reason.append("EXC_ALIGNFLT");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            default:
+              reason.append(flags_string);
+              BPLOG(INFO) << "Unknown exception reason " << reason;
+              break;
+          }
+          break;
+        case MD_EXCEPTION_MAC_ARITHMETIC:
+          reason = "EXC_ARITHMETIC / ";
+          switch (raw_system_info->processor_architecture) {
+            case MD_CPU_ARCHITECTURE_PPC: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_PPC_OVERFLOW:
+                  reason.append("EXC_PPC_OVERFLOW");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_ZERO_DIVIDE:
+                  reason.append("EXC_PPC_ZERO_DIVIDE");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_FLOAT_INEXACT:
+                  reason.append("EXC_FLT_INEXACT");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_FLOAT_ZERO_DIVIDE:
+                  reason.append("EXC_PPC_FLT_ZERO_DIVIDE");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_FLOAT_UNDERFLOW:
+                  reason.append("EXC_PPC_FLT_UNDERFLOW");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_FLOAT_OVERFLOW:
+                  reason.append("EXC_PPC_FLT_OVERFLOW");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_FLOAT_NOT_A_NUMBER:
+                  reason.append("EXC_PPC_FLT_NOT_A_NUMBER");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_NO_EMULATION:
+                  reason.append("EXC_PPC_NOEMULATION");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_PPC_ALTIVEC_ASSIST:
+                  reason.append("EXC_PPC_ALTIVECASSIST");
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            case MD_CPU_ARCHITECTURE_X86: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_X86_DIV:
+                  reason.append("EXC_I386_DIV");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_INTO:
+                  reason.append("EXC_I386_INTO");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_NOEXT:
+                  reason.append("EXC_I386_NOEXT");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_EXTOVR:
+                  reason.append("EXC_I386_EXTOVR");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_EXTERR:
+                  reason.append("EXC_I386_EXTERR");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_EMERR:
+                  reason.append("EXC_I386_EMERR");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_BOUND:
+                  reason.append("EXC_I386_BOUND");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_SSEEXTERR:
+                  reason.append("EXC_I386_SSEEXTERR");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            default:
+              reason.append(flags_string);
+              BPLOG(INFO) << "Unknown exception reason " << reason;
+              break;
+          }
+          break;
+        case MD_EXCEPTION_MAC_EMULATION:
+          reason = "EXC_EMULATION / ";
+          reason.append(flags_string);
+          break;
+        case MD_EXCEPTION_MAC_SOFTWARE:
+          reason = "EXC_SOFTWARE / ";
+          switch (exception_flags) {
+            case MD_EXCEPTION_CODE_MAC_ABORT:
+              reason.append("SIGABRT");
+              break;
+            case MD_EXCEPTION_CODE_MAC_NS_EXCEPTION:
+              reason.append("UNCAUGHT_NS_EXCEPTION");
+              break;
+            // These are ppc only but shouldn't be a problem as they're
+            // unused on x86
+            case MD_EXCEPTION_CODE_MAC_PPC_TRAP:
+              reason.append("EXC_PPC_TRAP");
+              break;
+            case MD_EXCEPTION_CODE_MAC_PPC_MIGRATE:
+              reason.append("EXC_PPC_MIGRATE");
+              break;
+            default:
+              reason.append(flags_string);
+              BPLOG(INFO) << "Unknown exception reason " << reason;
+              break;
+          }
+          break;
+        case MD_EXCEPTION_MAC_BREAKPOINT:
+          reason = "EXC_BREAKPOINT / ";
+          switch (raw_system_info->processor_architecture) {
+            case MD_CPU_ARCHITECTURE_ARM: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_ARM_DA_ALIGN:
+                  reason.append("EXC_ARM_DA_ALIGN");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_ARM_DA_DEBUG:
+                  reason.append("EXC_ARM_DA_DEBUG");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_ARM_BREAKPOINT:
+                  reason.append("EXC_ARM_BREAKPOINT");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            case MD_CPU_ARCHITECTURE_PPC: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_PPC_BREAKPOINT:
+                  reason.append("EXC_PPC_BREAKPOINT");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            case MD_CPU_ARCHITECTURE_X86: {
+              switch (exception_flags) {
+                case MD_EXCEPTION_CODE_MAC_X86_SGL:
+                  reason.append("EXC_I386_SGL");
+                  break;
+                case MD_EXCEPTION_CODE_MAC_X86_BPT:
+                  reason.append("EXC_I386_BPT");
+                  break;
+                default:
+                  reason.append(flags_string);
+                  BPLOG(INFO) << "Unknown exception reason " << reason;
+                  break;
+              }
+              break;
+            }
+            default:
+              reason.append(flags_string);
+              BPLOG(INFO) << "Unknown exception reason " << reason;
+              break;
+          }
+          break;
+        case MD_EXCEPTION_MAC_SYSCALL:
+          reason = "EXC_SYSCALL / ";
+          reason.append(flags_string);
+          break;
+        case MD_EXCEPTION_MAC_MACH_SYSCALL:
+          reason = "EXC_MACH_SYSCALL / ";
+          reason.append(flags_string);
+          break;
+        case MD_EXCEPTION_MAC_RPC_ALERT:
+          reason = "EXC_RPC_ALERT / ";
+          reason.append(flags_string);
+          break;
+      }
+      break;
+    }
+
     case MD_OS_WIN32_NT:
     case MD_OS_WIN32_WINDOWS: {
-      switch (raw_exception->exception_record.exception_code) {
+      switch (exception_code) {
         case MD_EXCEPTION_CODE_WIN_CONTROL_C:
           reason = "DBG_CONTROL_C";
           break;
@@ -340,7 +817,27 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, u_int64_t *address) {
           // data.
           // This information is useful in addition to the code address, which
           // will be present in the crash thread's instruction field anyway.
-          reason = "EXCEPTION_ACCESS_VIOLATION";
+          if (raw_exception->exception_record.number_parameters >= 1) {
+            MDAccessViolationTypeWin av_type =
+                static_cast<MDAccessViolationTypeWin>
+                (raw_exception->exception_record.exception_information[0]);
+            switch (av_type) {
+              case MD_ACCESS_VIOLATION_WIN_READ:
+                reason = "EXCEPTION_ACCESS_VIOLATION_READ";
+                break;
+              case MD_ACCESS_VIOLATION_WIN_WRITE:
+                reason = "EXCEPTION_ACCESS_VIOLATION_WRITE";
+                break;
+              case MD_ACCESS_VIOLATION_WIN_EXEC:
+                reason = "EXCEPTION_ACCESS_VIOLATION_EXEC";
+                break;
+              default:
+                reason = "EXCEPTION_ACCESS_VIOLATION";
+                break;
+            }
+          } else {
+            reason = "EXCEPTION_ACCESS_VIOLATION";
+          }
           if (address &&
               raw_exception->exception_record.number_parameters >= 2) {
             *address =
@@ -401,11 +898,317 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, u_int64_t *address) {
         case MD_EXCEPTION_CODE_WIN_POSSIBLE_DEADLOCK:
           reason = "EXCEPTION_POSSIBLE_DEADLOCK";
           break;
+        case MD_EXCEPTION_CODE_WIN_STACK_BUFFER_OVERRUN:
+          reason = "EXCEPTION_STACK_BUFFER_OVERRUN";
+          break;
+        case MD_EXCEPTION_CODE_WIN_HEAP_CORRUPTION:
+          reason = "EXCEPTION_HEAP_CORRUPTION";
+          break;
+        case MD_EXCEPTION_CODE_WIN_UNHANDLED_CPP_EXCEPTION:
+          reason = "Unhandled C++ Exception";
+          break;
+        default:
+          BPLOG(INFO) << "Unknown exception reason " << reason;
+          break;
       }
+      break;
+    }
+
+    case MD_OS_ANDROID:
+    case MD_OS_LINUX: {
+      switch (exception_code) {
+        case MD_EXCEPTION_CODE_LIN_SIGHUP:
+          reason = "SIGHUP";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGINT:
+          reason = "SIGINT";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGQUIT:
+          reason = "SIGQUIT";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGILL:
+          reason = "SIGILL";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGTRAP:
+          reason = "SIGTRAP";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGABRT:
+          reason = "SIGABRT";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGBUS:
+          reason = "SIGBUS";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGFPE:
+          reason = "SIGFPE";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGKILL:
+          reason = "SIGKILL";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGUSR1:
+          reason = "SIGUSR1";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGSEGV:
+          reason = "SIGSEGV";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGUSR2:
+          reason = "SIGUSR2";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGPIPE:
+          reason = "SIGPIPE";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGALRM:
+          reason = "SIGALRM";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGTERM:
+          reason = "SIGTERM";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGSTKFLT:
+          reason = "SIGSTKFLT";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGCHLD:
+          reason = "SIGCHLD";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGCONT:
+          reason = "SIGCONT";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGSTOP:
+          reason = "SIGSTOP";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGTSTP:
+          reason = "SIGTSTP";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGTTIN:
+          reason = "SIGTTIN";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGTTOU:
+          reason = "SIGTTOU";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGURG:
+          reason = "SIGURG";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGXCPU:
+          reason = "SIGXCPU";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGXFSZ:
+          reason = "SIGXFSZ";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGVTALRM:
+          reason = "SIGVTALRM";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGPROF:
+          reason = "SIGPROF";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGWINCH:
+          reason = "SIGWINCH";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGIO:
+          reason = "SIGIO";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGPWR:
+          reason = "SIGPWR";
+          break;
+        case MD_EXCEPTION_CODE_LIN_SIGSYS:
+          reason = "SIGSYS";
+          break;
+      case MD_EXCEPTION_CODE_LIN_DUMP_REQUESTED:
+          reason = "DUMP_REQUESTED";
+          break;
+        default:
+          BPLOG(INFO) << "Unknown exception reason " << reason;
+          break;
+      }
+      break;
+    }
+
+    case MD_OS_SOLARIS: {
+      switch (exception_code) {
+        case MD_EXCEPTION_CODE_SOL_SIGHUP:
+          reason = "SIGHUP";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGINT:
+          reason = "SIGINT";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGQUIT:
+          reason = "SIGQUIT";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGILL:
+          reason = "SIGILL";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGTRAP:
+          reason = "SIGTRAP";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGIOT:
+          reason = "SIGIOT | SIGABRT";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGEMT:
+          reason = "SIGEMT";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGFPE:
+          reason = "SIGFPE";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGKILL:
+          reason = "SIGKILL";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGBUS:
+          reason = "SIGBUS";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGSEGV:
+          reason = "SIGSEGV";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGSYS:
+          reason = "SIGSYS";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGPIPE:
+          reason = "SIGPIPE";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGALRM:
+          reason = "SIGALRM";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGTERM:
+          reason = "SIGTERM";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGUSR1:
+          reason = "SIGUSR1";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGUSR2:
+          reason = "SIGUSR2";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGCLD:
+          reason = "SIGCLD | SIGCHLD";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGPWR:
+          reason = "SIGPWR";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGWINCH:
+          reason = "SIGWINCH";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGURG:
+          reason = "SIGURG";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGPOLL:
+          reason = "SIGPOLL | SIGIO";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGSTOP:
+          reason = "SIGSTOP";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGTSTP:
+          reason = "SIGTSTP";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGCONT:
+          reason = "SIGCONT";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGTTIN:
+          reason = "SIGTTIN";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGTTOU:
+          reason = "SIGTTOU";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGVTALRM:
+          reason = "SIGVTALRM";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGPROF:
+          reason = "SIGPROF";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGXCPU:
+          reason = "SIGXCPU";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGXFSZ:
+          reason = "SIGXFSZ";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGWAITING:
+          reason = "SIGWAITING";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGLWP:
+          reason = "SIGLWP";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGFREEZE:
+          reason = "SIGFREEZE";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGTHAW:
+          reason = "SIGTHAW";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGCANCEL:
+          reason = "SIGCANCEL";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGLOST:
+          reason = "SIGLOST";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGXRES:
+          reason = "SIGXRES";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGJVM1:
+          reason = "SIGJVM1";
+          break;
+        case MD_EXCEPTION_CODE_SOL_SIGJVM2:
+          reason = "SIGJVM2";
+          break;
+        default:
+          BPLOG(INFO) << "Unknown exception reason " << reason;
+          break;
+      }
+      break;
+    }
+
+    default: {
+      BPLOG(INFO) << "Unknown exception reason " << reason;
+      break;
     }
   }
 
   return reason;
 }
 
-}  // namespace google_airbag
+// static
+string MinidumpProcessor::GetAssertion(Minidump *dump) {
+  MinidumpAssertion *assertion = dump->GetAssertion();
+  if (!assertion)
+    return "";
+
+  const MDRawAssertionInfo *raw_assertion = assertion->assertion();
+  if (!raw_assertion)
+    return "";
+
+  string assertion_string;
+  switch (raw_assertion->type) {
+  case MD_ASSERTION_INFO_TYPE_INVALID_PARAMETER:
+    assertion_string = "Invalid parameter passed to library function";
+    break;
+  case MD_ASSERTION_INFO_TYPE_PURE_VIRTUAL_CALL:
+    assertion_string = "Pure virtual function called";
+    break;
+  default: {
+    char assertion_type[32];
+    snprintf(assertion_type, sizeof(assertion_type),
+             "0x%08x", raw_assertion->type);
+    assertion_string = "Unknown assertion type ";
+    assertion_string += assertion_type;
+    break;
+  }
+  }
+
+  string expression = assertion->expression();
+  if (!expression.empty()) {
+    assertion_string.append(" " + expression);
+  }
+
+  string function = assertion->function();
+  if (!function.empty()) {
+    assertion_string.append(" in function " + function);
+  }
+
+  string file = assertion->file();
+  if (!file.empty()) {
+    assertion_string.append(", in file " + file);
+  }
+
+  if (raw_assertion->line != 0) {
+    char assertion_line[32];
+    snprintf(assertion_line, sizeof(assertion_line), "%u", raw_assertion->line);
+    assertion_string.append(" at line ");
+    assertion_string.append(assertion_line);
+  }
+
+  return assertion_string;
+}
+
+}  // namespace google_breakpad

@@ -1,4 +1,4 @@
-// Copyright (c) 2006, Google Inc.
+// Copyright (c) 2010 Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,43 +39,40 @@
 #define PROCESSOR_STACKWALKER_PPC_H__
 
 
-#include "google_airbag/common/airbag_types.h"
-#include "google_airbag/common/minidump_format.h"
-#include "google_airbag/processor/stackwalker.h"
+#include "google_breakpad/common/breakpad_types.h"
+#include "google_breakpad/common/minidump_format.h"
+#include "google_breakpad/processor/stackwalker.h"
 
-namespace google_airbag {
+namespace google_breakpad {
 
-class MinidumpContext;
-class MinidumpModuleList;
-
+class CodeModules;
 
 class StackwalkerPPC : public Stackwalker {
  public:
-  // context is a MinidumpContext object that gives access to ppc-specific
+  // context is a ppc context object that gives access to ppc-specific
   // register state corresponding to the innermost called frame to be
   // included in the stack.  The other arguments are passed directly through
   // to the base Stackwalker constructor.
-  StackwalkerPPC(const MDRawContextPPC *context,
-                 MemoryRegion *memory,
-                 MinidumpModuleList *modules,
-                 SymbolSupplier *supplier);
+  StackwalkerPPC(const SystemInfo* system_info,
+                 const MDRawContextPPC* context,
+                 MemoryRegion* memory,
+                 const CodeModules* modules,
+                 StackFrameSymbolizer* frame_symbolizer);
 
  private:
   // Implementation of Stackwalker, using ppc context (stack pointer in %r1,
   // saved program counter in %srr0) and stack conventions (saved stack
   // pointer at 0(%r1), return address at 8(0(%r1)).
   virtual StackFrame* GetContextFrame();
-  virtual StackFrame* GetCallerFrame(
-      const CallStack *stack,
-      const vector< linked_ptr<StackFrameInfo> > &stack_frame_info);
+  virtual StackFrame* GetCallerFrame(const CallStack* stack);
 
   // Stores the CPU context corresponding to the innermost stack frame to
   // be returned by GetContextFrame.
-  const MDRawContextPPC *context_;
+  const MDRawContextPPC* context_;
 };
 
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 
 #endif  // PROCESSOR_STACKWALKER_PPC_H__

@@ -53,7 +53,7 @@
 #ifndef PROCESSOR_LINKED_PTR_H__
 #define PROCESSOR_LINKED_PTR_H__
 
-namespace google_airbag {
+namespace google_breakpad {
 
 // This is used internally by all instances of linked_ptr<>.  It needs to be
 // a non-template class because different types of linked_ptr<> can refer to
@@ -128,7 +128,7 @@ class linked_ptr {
   // Release ownership of the pointed object and returns it.
   // Sole ownership by this linked_ptr object is required.
   T* release() {
-    bool last = link_.depart();
+    link_.depart();
     T* v = value_;
     value_ = NULL;
     return v;
@@ -188,6 +188,6 @@ linked_ptr<T> make_linked_ptr(T* ptr) {
   return linked_ptr<T>(ptr);
 }
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 #endif  // PROCESSOR_LINKED_PTR_H__

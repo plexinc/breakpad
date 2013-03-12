@@ -36,6 +36,8 @@
 #include <stdarg.h>
 #include <wchar.h>
 
+#include <string>
+
 // The "ll" printf format size specifier corresponding to |long long| was
 // intrudced in MSVC8.  Earlier versions did not provide this size specifier,
 // but "I64" can be used to print 64-bit types.  Don't use "I64" where "ll"
@@ -47,14 +49,26 @@
 #define WIN_STRING_FORMAT_LL "I64"
 #endif  // MSC_VER >= 1400
 
-namespace google_airbag {
+// A nonconforming version of swprintf, without the length argument, was
+// included with the CRT prior to MSVC8.  Although a conforming version was
+// also available via an overload, it is not reliably chosen.  _snwprintf
+// behaves as a standards-confirming swprintf should, so force the use of
+// _snwprintf when using older CRTs.
+#if _MSC_VER < 1400  // MSVC 2005/8
+#define swprintf _snwprintf
+#else
+// For MSVC8 and newer, swprintf_s is the recommended method. Conveniently,
+// it takes the same argument list as swprintf.
+#define swprintf swprintf_s
+#endif  // MSC_VER < 1400
+
+namespace google_breakpad {
+
+using std::string;
+using std::wstring;
 
 class WindowsStringUtils {
  public:
-  // Equivalent to MSVC8's swprintf, which always 0-terminates buffer.
-  static void safe_swprintf(wchar_t *buffer, size_t count,
-                            const wchar_t *format, ...);
-
   // Roughly equivalent to MSVC8's wcscpy_s, except pre-MSVC8, this does
   // not fail if source is longer than destination_size.  The destination
   // buffer is always 0-terminated.
@@ -68,6 +82,17 @@ class WindowsStringUtils {
   static void safe_wcsncpy(wchar_t *destination, size_t destination_size,
                            const wchar_t *source, size_t count);
 
+  // Performs multi-byte to wide character conversion on C++ strings, using
+  // mbstowcs_s (MSVC8) or mbstowcs (pre-MSVC8).  Returns false on failure,
+  // without setting wcs.
+  static bool safe_mbstowcs(const string &mbs, wstring *wcs);
+
+  // The inverse of safe_mbstowcs.
+  static bool safe_wcstombs(const wstring &wcs, string *mbs);
+
+  // Returns the base name of a file, e.g. strips off the path.
+  static wstring GetBaseName(const wstring &filename);
+
  private:
   // Disallow instantiation and other object-based operations.
   WindowsStringUtils();
@@ -75,21 +100,6 @@ class WindowsStringUtils {
   ~WindowsStringUtils();
   void operator=(const WindowsStringUtils&);
 };
-
-// static
-inline void WindowsStringUtils::safe_swprintf(wchar_t *buffer, size_t count,
-                                              const wchar_t *format, ...) {
-  va_list args;
-  va_start(args, format);
-  vswprintf(buffer, count, format, args);
-
-#if _MSC_VER < 1400  // MSVC 2005/8
-  // Pre-MSVC 2005/8 doesn't 0-terminate the buffer if the formatted string
-  // is larger than the buffer.  Ensure that the string is 0-terminated.
-  if (buffer && count)
-    buffer[count - 1] = 0;
-#endif  // _MSC_VER < 1400
-}
 
 // static
 inline void WindowsStringUtils::safe_wcscpy(wchar_t *destination,
@@ -127,6 +137,6 @@ inline void WindowsStringUtils::safe_wcsncpy(wchar_t *destination,
 #endif  // _MSC_VER >= 1400
 }
 
-}  // namespace google_airbag
+}  // namespace google_breakpad
 
 #endif  // COMMON_WINDOWS_STRING_UTILS_INL_H__

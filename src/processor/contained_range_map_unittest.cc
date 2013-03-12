@@ -31,9 +31,11 @@
 //
 // Author: Mark Mentovai
 
-#include <cstdio>
+#include <stdio.h>
 
 #include "processor/contained_range_map-inl.h"
+
+#include "processor/logging.h"
 
 
 #define ASSERT_TRUE(condition) \
@@ -48,7 +50,7 @@
 namespace {
 
 
-using google_airbag::ContainedRangeMap;
+using google_breakpad::ContainedRangeMap;
 
 
 static bool RunTests() {
@@ -255,5 +257,7 @@ static bool RunTests() {
 
 
 int main(int argc, char **argv) {
+  BPLOG_INIT(&argc, &argv);
+
   return RunTests() ? 0 : 1;
 }
