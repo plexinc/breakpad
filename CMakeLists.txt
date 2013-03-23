@@ -30,5 +30,6 @@ include_directories(src ${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(src/client)
 add_subdirectory(src/common)
+add_subdirectory(src/third_party)
 add_subdirectory(src/tools/linux)
 add_subdirectory(src/google_breakpad/common)

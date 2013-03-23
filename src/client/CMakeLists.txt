@@ -22,14 +22,15 @@ add_library(breakpad_client STATIC
 
 install(TARGETS breakpad_client DESTINATION lib)
 
-install(FILES linux/handler/exception_handler.h
-              linux/handler/minidump_descriptor.h
-        DESTINATION include/breakpad/linux/handler)
+file(GLOB HEADERS linux/handler/*h)
+install(FILES ${HEADERS}
+        DESTINATION include/breakpad/client/linux/handler)
 
-install(FILES linux/crash_generation/crash_generation_server.h
-              linux/crash_generation/crash_generation_client.h
-        DESTINATION include/breakpad/linux/crash_generation)
+file(GLOB HEADERS linux/crash_generation/*h)
+install(FILES ${HEADERS}
+        DESTINATION include/breakpad/client/linux/crash_generation)
 
-install(FILES linux/minidump_writer/minidump_writer.h
-        DESTINATION include/breakpad/linux/minidump_write)
+file(GLOB HEADERS linux/minidump_writer/*h)
+install(FILES ${HEADERS}
+        DESTINATION include/breakpad/client/linux/minidump_writer)
 
