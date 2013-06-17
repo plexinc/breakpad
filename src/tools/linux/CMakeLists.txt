@@ -1,15 +1,16 @@
-add_executable(dump_syms dump_syms/dump_syms.cc)
-target_link_libraries(dump_syms common)
+add_executable(dump_syms dump_syms/dump_syms.cc $<TARGET_OBJECTS:common>)
+target_link_libraries(dump_syms)
 
 add_executable(core2md
   core2md/core2md.cc
   ${PROJECT_SOURCE_DIR}/src/client/linux/minidump_writer/linux_core_dumper.cc
   ${PROJECT_SOURCE_DIR}/src/common/linux/elf_core_dump.cc
+  $<TARGET_OBJECTS:common>
 )
-target_link_libraries(core2md breakpad_client common)
+target_link_libraries(core2md breakpad_client)
 
-add_executable(md2core md2core/minidump-2-core.cc)
-target_link_libraries(md2core common)
+add_executable(md2core md2core/minidump-2-core.cc $<TARGET_OBJECTS:common>)
+target_link_libraries(md2core)
 
 add_library(http_upload STATIC ${PROJECT_SOURCE_DIR}/src/common/linux/http_upload.cc)
 
