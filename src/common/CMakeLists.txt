@@ -32,7 +32,7 @@ if(APPLE)
   )
 
   file(GLOB MAC_HEADERS mac/*.h)
-  install(FILES ${LINUX_HEADERS} DESTINATION include/breakpad/common/mac)
+  install(FILES ${MAC_HEADERS} DESTINATION include/breakpad/common/mac)
 
 else(APPLE)
   list(APPEND common_SRC
