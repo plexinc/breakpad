@@ -26,7 +26,6 @@ if(APPLE)
     mac/macho_utilities.cc
     mac/macho_walker.cc
     mac/macho_reader.cc
-    mac/SimpleStringDictionary.mm
     mac/string_utilities.cc
     mac/dump_syms.mm
   )
