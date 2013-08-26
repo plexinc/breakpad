@@ -159,7 +159,7 @@ class ExceptionHandler {
 #if TARGET_OS_IPHONE
     return false;
 #else
-    return crash_generation_client_.get() != NULL;
+    return is_out_of_process_;
 #endif
   }
 
@@ -273,6 +273,8 @@ class ExceptionHandler {
   // Client for out-of-process dump generation.
   scoped_ptr<CrashGenerationClient> crash_generation_client_;
 #endif
+  
+  bool is_out_of_process_;
 };
 
 }  // namespace google_breakpad

@@ -233,13 +233,16 @@ ExceptionHandler::ExceptionHandler(const string &dump_path,
       installed_exception_handler_(false),
       is_in_teardown_(false),
       last_minidump_write_result_(false),
-      use_minidump_write_mutex_(false) {
+      use_minidump_write_mutex_(false),
+      is_out_of_process_(false) {
   // This will update to the ID and C-string pointers
   set_dump_path(dump_path);
   MinidumpGenerator::GatherSystemInformation();
 #if !TARGET_OS_IPHONE
-  if (port_name)
+  if (port_name) {
     crash_generation_client_.reset(new CrashGenerationClient(port_name));
+    is_out_of_process_ = true;
+  }
 #endif
   Setup(install_handler);
 }
