@@ -599,6 +599,12 @@ void* ExceptionHandler::WaitForMessage(void* exception_handler_class) {
                  MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
       }
     }
+    else
+    {
+      // basically we are fucked
+      fprintf(stderr, "mach_msg failed with error code %x\n", result);
+      return NULL;
+    }
   }
 
   return NULL;
@@ -627,6 +633,7 @@ void ExceptionHandler::SignalHandler(int sig, siginfo_t* info, void* uc) {
 bool ExceptionHandler::InstallHandler() {
   // If a handler is already installed, something is really wrong.
   if (gProtectedData.handler != NULL) {
+    fprintf(stderr, "HANDLER ALREADY INSTALLED!\n");
     return false;
   }
   if (!IsOutOfProcess()) {
@@ -639,6 +646,7 @@ bool ExceptionHandler::InstallHandler() {
 
     scoped_ptr<struct sigaction> old(new struct sigaction);
     if (sigaction(SIGABRT, &sa, old.get()) == -1) {
+      fprintf(stderr, "SIGACTION FAILED!\n");
       return false;
     }
     old_handler_.swap(old);
@@ -658,6 +666,7 @@ bool ExceptionHandler::InstallHandler() {
 #endif
   }
   catch (std::bad_alloc) {
+    fprintf(stderr, "BAD_ALLOC FAILED!\n");
     return false;
   }
 
@@ -677,6 +686,8 @@ bool ExceptionHandler::InstallHandler() {
     result = task_set_exception_ports(current_task, s_exception_mask,
                                       handler_port_, EXCEPTION_DEFAULT,
                                       THREAD_STATE_NONE);
+  else
+    fprintf(stderr, "task_set_execption_ports FAILED!\n");
 
   installed_exception_handler_ = (result == KERN_SUCCESS);
 
