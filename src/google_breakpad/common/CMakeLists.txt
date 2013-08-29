@@ -8,6 +8,7 @@ set(HEADERS
   minidump_cpu_ppc.h
   minidump_exception_linux.h
   minidump_exception_win32.h
+  minidump_exception_ps3.h
   minidump_cpu_arm.h
   minidump_cpu_sparc.h
   minidump_exception_mac.h
