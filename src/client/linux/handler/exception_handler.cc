@@ -391,13 +391,15 @@ bool ExceptionHandler::HandleSignal(int sig, siginfo_t* info, void* uc) {
   bool signal_pid_trusted = info->si_code == SI_USER ||
       info->si_code == SI_TKILL;
   if (signal_trusted || (signal_pid_trusted && info->si_pid == getpid())) {
-    sys_prctl(PR_SET_DUMPABLE, 1);
+    sys_prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
   }
   CrashContext context;
   memcpy(&context.siginfo, info, sizeof(siginfo_t));
   memcpy(&context.context, uc, sizeof(struct ucontext));
-#if !defined(__ARM_EABI__)
+#if !defined(__ARM_EABI__) && !defined(__mips__)
   // FP state is not part of user ABI on ARM Linux.
+  // In case of MIPS Linux FP state is already part of struct ucontext
+  // and 'float_state' is not a member of CrashContext.
   struct ucontext *uc_ptr = (struct ucontext*)uc;
   if (uc_ptr->uc_mcontext.fpregs) {
     memcpy(&context.float_state,
@@ -469,7 +471,7 @@ bool ExceptionHandler::GenerateDump(CrashContext *context) {
 
   int r, status;
   // Allow the child to ptrace us
-  sys_prctl(PR_SET_PTRACER, child);
+  sys_prctl(PR_SET_PTRACER, child, 0, 0, 0);
   SendContinueSignalToChild();
   do {
     r = sys_waitpid(child, &status, __WALL);
@@ -573,7 +575,7 @@ bool ExceptionHandler::WriteMinidump() {
   }
 
   // Allow this process to be dumped.
-  sys_prctl(PR_SET_DUMPABLE, 1);
+  sys_prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
 
   CrashContext context;
   int getcontext_result = getcontext(&context.context);
@@ -602,7 +604,7 @@ bool ExceptionHandler::WriteMinidump() {
   }
 #endif
 
-#if !defined(__ARM_EABI__)
+#if !defined(__ARM_EABI__) && !defined(__mips__)
   // FPU state is not part of ARM EABI ucontext_t.
   memcpy(&context.float_state, context.context.uc_mcontext.fpregs,
          sizeof(context.float_state));
@@ -621,6 +623,9 @@ bool ExceptionHandler::WriteMinidump() {
 #elif defined(__arm__)
   context.siginfo.si_addr =
       reinterpret_cast<void*>(context.context.uc_mcontext.arm_pc);
+#elif defined(__mips__)
+  context.siginfo.si_addr =
+      reinterpret_cast<void*>(context.context.uc_mcontext.pc);
 #else
 #error "This code has not been ported to your platform yet."
 #endif
