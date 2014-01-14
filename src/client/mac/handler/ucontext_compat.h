@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Google Inc.
+// Copyright 2013 Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,31 +27,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BREAKPAD_GOOGLETEST_INCLUDES_H__
-#define BREAKPAD_GOOGLETEST_INCLUDES_H__
+#ifndef CLIENT_MAC_HANDLER_UCONTEXT_COMPAT_H_
+#define CLIENT_MAC_HANDLER_UCONTEXT_COMPAT_H_
 
-#include "testing/gtest/include/gtest/gtest.h"
-#include "testing/include/gmock/gmock.h"
+#include <sys/ucontext.h>
 
-// If AddressSanitizer is used, NULL pointer dereferences generate SIGILL
-// (illegal instruction) instead of SIGSEGV (segmentation fault).  Also,
-// the number of memory regions differs, so there is no point in running
-// this test if AddressSanitizer is used.
-//
-// Ideally we'd use this attribute to disable ASAN on a per-func basis,
-// but this doesn't seem to actually work, and it's changed names over
-// time.  So just stick with disabling the actual tests.
-// http://crbug.com/304575
-//#define NO_ASAN __attribute__((no_sanitize_address))
-#if defined(__clang__) && defined(__has_feature)
-// Have to keep this check sep from above as newer gcc will barf on it.
-# if __has_feature(address_sanitizer)
-#  define ADDRESS_SANITIZER
-# endif
-#elif defined(__GNUC__) && defined(__SANITIZE_ADDRESS__)
-# define ADDRESS_SANITIZER
+// The purpose of this file is to work around the fact that ucontext_t's
+// uc_mcontext member is an mcontext_t rather than an mcontext64_t on ARM64.
+#if defined(__arm64__)
+// <sys/ucontext.h> doesn't include the below file.
+#include <sys/_types/_ucontext64.h>
+typedef ucontext64_t breakpad_ucontext_t;
+#define breakpad_uc_mcontext uc_mcontext64
 #else
-# undef ADDRESS_SANITIZER
-#endif
+typedef ucontext_t breakpad_ucontext_t;
+#define breakpad_uc_mcontext uc_mcontext
+#endif  // defined(__arm64__)
 
-#endif  // BREAKPAD_GOOGLETEST_INCLUDES_H__
+#endif  // CLIENT_MAC_HANDLER_UCONTEXT_COMPAT_H_

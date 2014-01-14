@@ -49,6 +49,10 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
+#if defined(__i386)
+#include <cpuid.h>
+#endif
+
 #include "client/linux/minidump_writer/directory_reader.h"
 #include "client/linux/minidump_writer/line_reader.h"
 #include "common/linux/linux_libc_support.h"
@@ -191,9 +195,20 @@ bool LinuxPtraceDumper::GetThreadInfoByIndex(size_t index, ThreadInfo* info) {
   }
 
 #if defined(__i386)
-  if (sys_ptrace(PTRACE_GETFPXREGS, tid, NULL, &info->fpxregs) == -1)
-    return false;
+#if !defined(bit_FXSAVE)  // e.g. Clang
+#define bit_FXSAVE bit_FXSR
 #endif
+  // Detect if the CPU supports the FXSAVE/FXRSTOR instructions
+  int eax, ebx, ecx, edx;
+  __cpuid(1, eax, ebx, ecx, edx);
+  if (edx & bit_FXSAVE) {
+    if (sys_ptrace(PTRACE_GETFPXREGS, tid, NULL, &info->fpxregs) == -1) {
+      return false;
+    }
+  } else {
+    memset(&info->fpxregs, 0, sizeof(info->fpxregs));
+  }
+#endif  // defined(__i386)
 
 #if defined(__i386) || defined(__x86_64)
   for (unsigned i = 0; i < ThreadInfo::kNumDebugRegisters; ++i) {

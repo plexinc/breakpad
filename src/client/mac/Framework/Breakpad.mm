@@ -28,19 +28,12 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#define VERBOSE 0
 
-#if VERBOSE
-  static bool gDebugLog = true;
-#else
-  static bool gDebugLog = false;
-#endif
-
-#define DEBUGLOG if (gDebugLog) fprintf
 #define IGNORE_DEBUGGER "BREAKPAD_IGNORE_DEBUGGER"
 
 #import "client/mac/Framework/Breakpad.h"
 
+#include <assert.h>
 #import <Foundation/Foundation.h>
 #include <pthread.h>
 #include <sys/stat.h>
@@ -103,36 +96,32 @@ pthread_mutex_t gDictionaryMutex;
 // ProtectedMemoryLocker will unprotect this block after taking the lock.
 // Its destructor will first re-protect the memory then release the lock.
 class ProtectedMemoryLocker {
-public:
-  // allocator may be NULL, in which case no Protect() or Unprotect() calls
-  // will be made, but a lock will still be taken
+ public:
   ProtectedMemoryLocker(pthread_mutex_t *mutex,
                         ProtectedMemoryAllocator *allocator)
-  : mutex_(mutex), allocator_(allocator) {
+      : mutex_(mutex),
+        allocator_(allocator) {
     // Lock the mutex
-    assert(pthread_mutex_lock(mutex_) == 0);
+    int rv = pthread_mutex_lock(mutex_);
+    assert(rv == 0);
 
     // Unprotect the memory
-    if (allocator_ ) {
-      allocator_->Unprotect();
-    }
+    allocator_->Unprotect();
   }
 
   ~ProtectedMemoryLocker() {
     // First protect the memory
-    if (allocator_) {
-      allocator_->Protect();
-    }
+    allocator_->Protect();
 
     // Then unlock the mutex
-    assert(pthread_mutex_unlock(mutex_) == 0);
+    int rv = pthread_mutex_unlock(mutex_);
+    assert(rv == 0);
   };
 
-private:
-  //  Keep anybody from ever creating one of these things not on the stack.
-  ProtectedMemoryLocker() { }
+ private:
+  ProtectedMemoryLocker();
   ProtectedMemoryLocker(const ProtectedMemoryLocker&);
-  ProtectedMemoryLocker & operator=(ProtectedMemoryLocker&);
+  ProtectedMemoryLocker& operator=(const ProtectedMemoryLocker&);
 
   pthread_mutex_t           *mutex_;
   ProtectedMemoryAllocator  *allocator_;
@@ -311,7 +300,6 @@ NSString * GetResourcePath() {
     // executable code, since that's how the Breakpad framework is built.
     resourcePath = [bundlePath stringByAppendingPathComponent:@"Resources/"];
   } else {
-    DEBUGLOG(stderr, "Could not find GetResourcePath\n");
     // fallback plan
     NSBundle *bundle =
         [NSBundle bundleWithIdentifier:@"com.Google.BreakpadFramework"];
@@ -330,7 +318,6 @@ bool Breakpad::Initialize(NSDictionary *parameters) {
 
   // Check for debugger
   if (IsDebuggerActive()) {
-    DEBUGLOG(stderr, "Debugger is active:  Not installing handler\n");
     return true;
   }
 
@@ -505,7 +492,6 @@ bool Breakpad::ExtractParameters(NSDictionary *parameters) {
   if (!inspectorPathString || !reporterPathString) {
     resourcePath = GetResourcePath();
     if (!resourcePath) {
-      DEBUGLOG(stderr, "Could not get resource path\n");
       return false;
     }
   }
@@ -518,7 +504,6 @@ bool Breakpad::ExtractParameters(NSDictionary *parameters) {
 
   // Verify that there is an Inspector tool.
   if (![[NSFileManager defaultManager] fileExistsAtPath:inspectorPathString]) {
-    DEBUGLOG(stderr, "Cannot find Inspector tool\n");
     return false;
   }
 
@@ -534,7 +519,6 @@ bool Breakpad::ExtractParameters(NSDictionary *parameters) {
   // Verify that there is a Reporter application.
   if (![[NSFileManager defaultManager]
              fileExistsAtPath:reporterPathString]) {
-    DEBUGLOG(stderr, "Cannot find Reporter tool\n");
     return false;
   }
 
@@ -544,17 +528,14 @@ bool Breakpad::ExtractParameters(NSDictionary *parameters) {
 
   // The product, version, and URL are required values.
   if (![product length]) {
-    DEBUGLOG(stderr, "Missing required product key.\n");
     return false;
   }
 
   if (![version length]) {
-    DEBUGLOG(stderr, "Missing required version key.\n");
     return false;
   }
 
   if (![urlStr length]) {
-    DEBUGLOG(stderr, "Missing required URL key.\n");
     return false;
   }
 
@@ -651,8 +632,6 @@ bool Breakpad::HandleException(int exception_type,
                                int exception_code,
                                int exception_subcode,
                                mach_port_t crashing_thread) {
-  DEBUGLOG(stderr, "Breakpad: an exception occurred\n");
-
   if (filter_callback_) {
     bool should_handle = filter_callback_(exception_type,
                                           exception_code,
