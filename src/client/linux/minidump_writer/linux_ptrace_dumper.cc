@@ -49,7 +49,7 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
-#if defined(__i386)
+#if defined(__i386) && defined(HAVE_CPUID_H)
 #include <cpuid.h>
 #endif
 
@@ -194,7 +194,7 @@ bool LinuxPtraceDumper::GetThreadInfoByIndex(size_t index, ThreadInfo* info) {
     return false;
   }
 
-#if defined(__i386)
+#if defined(__i386) && defined(HAVE_CPUID_H)
 #if !defined(bit_FXSAVE)  // e.g. Clang
 #define bit_FXSAVE bit_FXSR
 #endif

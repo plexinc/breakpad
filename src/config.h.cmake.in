@@ -33,6 +33,8 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H @HAVE_UNISTD_H@
 
+#cmakedefine HAVE_CPUID_H @HAVE_CPUID_H@
+
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #cmakedefine NO_MINUS_C_MINUS_O
 
