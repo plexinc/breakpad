@@ -27,9 +27,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#define NOMINMAX
+#include <windows.h>
+
 #include "common/windows/pdb_source_line_writer.h"
 
-#include <windows.h>
 #include <winnt.h>
 #include <atlbase.h>
 #include <dia2.h>
@@ -392,10 +394,10 @@ bool PDBSourceLineWriter::PrintFrameData() {
   if (!FindTable(session_, &frame_data_enum))
     return false;
 
-  DWORD last_type = std::numeric_limits<DWORD>::max()
-  DWORD last_rva = std::numeric_limits<DWORD>::max()
+  DWORD last_type = std::numeric_limits<DWORD>::max();
+  DWORD last_rva = std::numeric_limits<DWORD>::max();
   DWORD last_code_size = 0;
-  DWORD last_prolog_size = std::numeric_limits<DWORD>::max()
+  DWORD last_prolog_size = std::numeric_limits<DWORD>::max();
 
   CComPtr<IDiaFrameData> frame_data;
   ULONG count = 0;
