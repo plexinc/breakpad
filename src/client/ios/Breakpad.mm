@@ -98,7 +98,7 @@ class ProtectedMemoryLocker {
       : mutex_(mutex),
         allocator_(allocator) {
     // Lock the mutex
-    int rv = pthread_mutex_lock(mutex_);
+    __attribute__((unused)) int rv = pthread_mutex_lock(mutex_);
     assert(rv == 0);
 
     // Unprotect the memory
@@ -110,7 +110,7 @@ class ProtectedMemoryLocker {
     allocator_->Protect();
 
     // Then unlock the mutex
-    int rv = pthread_mutex_unlock(mutex_);
+    __attribute__((unused)) int rv = pthread_mutex_unlock(mutex_);
     assert(rv == 0);
   };
 
@@ -780,7 +780,7 @@ int BreakpadGetCrashReportCount(BreakpadRef ref) {
     Breakpad *breakpad = (Breakpad *)ref;
 
     if (breakpad) {
-       return [breakpad->CrashReportsToUpload() count];
+       return static_cast<int>([breakpad->CrashReportsToUpload() count]);
     }
   } catch(...) {    // don't let exceptions leave this C API
     fprintf(stderr, "BreakpadGetCrashReportCount() : error\n");
@@ -789,8 +789,13 @@ int BreakpadGetCrashReportCount(BreakpadRef ref) {
 }
 
 //=============================================================================
-void BreakpadUploadNextReport(BreakpadRef ref,
-                              NSDictionary *server_parameters) {
+void BreakpadUploadNextReport(BreakpadRef ref) {
+  BreakpadUploadNextReportWithParameters(ref, nil);
+}
+
+//=============================================================================
+void BreakpadUploadNextReportWithParameters(BreakpadRef ref,
+                                            NSDictionary *server_parameters) {
   try {
     // Not called at exception time
     Breakpad *breakpad = (Breakpad *)ref;
