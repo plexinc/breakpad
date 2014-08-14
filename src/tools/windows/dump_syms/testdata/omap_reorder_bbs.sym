@@ -282,7 +282,7 @@ FILE 4591 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\eh\hooks.cpp
 FILE 4643 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\initsect.cpp
 FILE 4664 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\rtcapi.h
 FILE 4680 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\rtcpriv.h
-FUNC 2cec 54 8 main
+FUNC 2cec 54 0 main
 2cec 6 57 1
 2cf2 8 58 1
 2cfa e 59 1
@@ -299,13 +299,13 @@ FUNC 25a8 21 0 google_breakpad::C::C()
 25a8 21 37 1
 FUNC 131c 14 0 google_breakpad::C::~C()
 131c 14 38 1
-FUNC 1b94 16 8 google_breakpad::C::set_member(int)
+FUNC 1b94 16 0 google_breakpad::C::set_member(int)
 1b94 16 40 1
 FUNC 11e8 1e 0 google_breakpad::C::f()
 11e8 1e 43 1
 FUNC 1b3c 10 0 google_breakpad::C::g()
 1b3c 10 44 1
-FUNC 669c 7 4 google_breakpad::C::h(google_breakpad::C const &)
+FUNC 669c 7 0 google_breakpad::C::h(google_breakpad::C const &)
 669c 7 45 1
 FUNC 16d4 20 0 google_breakpad::C::`scalar deleting destructor'(unsigned int)
 FUNC 211c c 0 google_breakpad::C::`scalar deleting destructor'(unsigned int)
@@ -317,14 +317,14 @@ FUNC 40f4 10 0 type_info::~type_info()
 FUNC 1fd4 1c 0 type_info::`scalar deleting destructor'(unsigned int)
 FUNC 46d8 7 0 type_info::`scalar deleting destructor'(unsigned int)
 FUNC 65a8 7 0 type_info::`scalar deleting destructor'(unsigned int)
-FUNC 12a0 b 4 operator delete(void *)
+FUNC 12a0 b 0 operator delete(void *)
 12a0 5 20 2875
 12a5 1 24 2875
 12a6 5 23 2875
-FUNC 198c 4 4 fast_error_exit
-FUNC 1ff0 18 4 fast_error_exit
-FUNC 455c 12 4 fast_error_exit
-FUNC 4d0c 5 4 fast_error_exit
+FUNC 198c 4 0 fast_error_exit
+FUNC 1ff0 18 0 fast_error_exit
+FUNC 455c 12 0 fast_error_exit
+FUNC 4d0c 5 0 fast_error_exit
 1ff0 5 326 4250
 1ff5 13 335 4250
 4d0c 5 337 4250
@@ -372,7 +372,7 @@ FUNC 620c a 0 mainCRTStartup
 620c 0 179 4250
 620c 5 186 4250
 6211 5 188 4250
-FUNC 66c3 70 4 type_info::_Type_info_dtor(type_info *)
+FUNC 66c3 70 0 type_info::_Type_info_dtor(type_info *)
 66c3 c 62 4473
 66cf 8 63 4473
 66d7 4 64 4473
@@ -389,7 +389,7 @@ FUNC 66c3 70 4 type_info::_Type_info_dtor(type_info *)
 6726 2 83 4473
 6728 2 72 4473
 672a 9 104 4473
-FUNC 27ab 88 8 strcmp
+FUNC 27ab 88 0 strcmp
 27ab 0 65 2791
 27ab 4 73 2791
 27af 4 74 2791
@@ -444,24 +444,24 @@ FUNC 27ab 88 8 strcmp
 282c 2 148 2791
 282e 3 149 2791
 2831 2 150 2791
-FUNC 26fc 14 4 free
-FUNC 2bcc 2 4 free
-FUNC 3888 18 4 free
-FUNC 3ea0 1f 4 free
+FUNC 26fc 14 0 free
+FUNC 2bcc 2 0 free
+FUNC 3888 18 0 free
+FUNC 3ea0 1f 0 free
 26fc 5 40 389
 2701 f 45 389
 3ea0 11 50 389
 3eb1 e 51 389
 3888 18 53 389
 2bcc 2 55 389
-FUNC 199c 10 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 2380 6 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 3ce8 10 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 4448 14 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 4778 1c 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 57d0 10 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 5a40 5 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
-FUNC 642c 10 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 199c 10 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 2380 6 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 3ce8 10 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 4448 14 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 4778 1c 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 57d0 10 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 5a40 5 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 642c 10 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
 4778 5 67 4397
 199c 10 68 4397
 3ce8 10 68 4397
@@ -477,10 +477,10 @@ FUNC 5a28 e 0 __CxxSetUnhandledExceptionFilter
 5a28 b 89 4397
 5a33 2 90 4397
 5a35 1 91 4397
-FUNC 1db0 5 4 __crtCorExitProcess
-FUNC 21a0 1e 4 __crtCorExitProcess
-FUNC 24cc 1a 4 __crtCorExitProcess
-FUNC 4c14 2 4 __crtCorExitProcess
+FUNC 1db0 5 0 __crtCorExitProcess
+FUNC 21a0 1e 0 __crtCorExitProcess
+FUNC 24cc 1a 0 __crtCorExitProcess
+FUNC 4c14 2 0 __crtCorExitProcess
 21a0 5 675 4186
 21a5 b 679 4186
 21b0 e 680 4186
@@ -488,7 +488,7 @@ FUNC 4c14 2 4 __crtCorExitProcess
 24d8 e 682 4186
 1db0 5 683 4186
 4c14 2 693 4186
-FUNC 6a9b 18 4 __crtExitProcess
+FUNC 6a9b 18 0 __crtExitProcess
 6a9b 5 698 4186
 6aa0 9 699 4186
 6aa9 a 708 4186
@@ -510,13 +510,13 @@ FUNC 4594 33 0 _init_pointers
 45b6 6 816 4186
 45bc a 817 4186
 45c6 1 818 4186
-FUNC 1bc8 3 8 _initterm_e
-FUNC 1de4 e 8 _initterm_e
-FUNC 22bc 2 8 _initterm_e
-FUNC 2944 10 8 _initterm_e
-FUNC 3dd4 3 8 _initterm_e
-FUNC 3e80 f 8 _initterm_e
-FUNC 6568 10 8 _initterm_e
+FUNC 1bc8 3 0 _initterm_e
+FUNC 1de4 e 0 _initterm_e
+FUNC 22bc 2 0 _initterm_e
+FUNC 2944 10 0 _initterm_e
+FUNC 3dd4 3 0 _initterm_e
+FUNC 3e80 f 0 _initterm_e
+FUNC 6568 10 0 _initterm_e
 2944 6 908 4186
 1de4 e 917 4186
 294a a 917 4186
@@ -526,19 +526,19 @@ FUNC 6568 10 8 _initterm_e
 1bc8 1 917 4186
 3e80 f 917 4186
 1bc9 2 928 4186
-FUNC 1d44 c 4 _cinit
-FUNC 2470 10 4 _cinit
-FUNC 2558 27 4 _cinit
-FUNC 2660 14 4 _cinit
-FUNC 269c 18 4 _cinit
-FUNC 27a4 2 4 _cinit
-FUNC 34ec 24 4 _cinit
-FUNC 48dc 10 4 _cinit
-FUNC 4bf8 2 4 _cinit
-FUNC 4dd4 18 4 _cinit
-FUNC 5b74 a 4 _cinit
-FUNC 69e4 18 4 _cinit
-FUNC 6f60 2 4 _cinit
+FUNC 1d44 c 0 _cinit
+FUNC 2470 10 0 _cinit
+FUNC 2558 27 0 _cinit
+FUNC 2660 14 0 _cinit
+FUNC 269c 18 0 _cinit
+FUNC 27a4 2 0 _cinit
+FUNC 34ec 24 0 _cinit
+FUNC 48dc 10 0 _cinit
+FUNC 4bf8 2 0 _cinit
+FUNC 4dd4 18 0 _cinit
+FUNC 5b74 a 0 _cinit
+FUNC 69e4 18 0 _cinit
+FUNC 6f60 2 0 _cinit
 69e4 5 258 4186
 4dd4 18 268 4186
 69e9 13 268 4186
@@ -557,7 +557,7 @@ FUNC 6f60 2 4 _cinit
 1d44 c 303 4186
 4bf8 2 307 4186
 6f60 2 308 4186
-FUNC 35a7 140 c doexit
+FUNC 35a7 140 0 doexit
 35a7 c 489 4186
 35b3 8 507 4186
 35bb 4 508 4186
@@ -592,11 +592,11 @@ FUNC 35a7 140 c doexit
 36d2 6 609 4186
 36d8 9 610 4186
 36e1 6 622 4186
-FUNC 6d68 16 4 exit
+FUNC 6d68 16 0 exit
 6d68 5 392 4186
 6d6d f 393 4186
 6d7c 2 394 4186
-FUNC 5464 16 4 _exit
+FUNC 5464 16 0 _exit
 5464 5 400 4186
 5469 f 401 4186
 5478 2 402 4186
@@ -608,16 +608,16 @@ FUNC 5544 f 0 _c_exit
 5544 0 414 4186
 5544 e 415 4186
 5552 1 416 4186
-FUNC 3218 1e 4 _amsg_exit
+FUNC 3218 1e 0 _amsg_exit
 3218 5 439 4186
 321d 5 440 4186
 3222 9 441 4186
 322b b 442 4186
-FUNC 1b78 4 4 _GET_RTERRMSG
-FUNC 2888 9 4 _GET_RTERRMSG
-FUNC 44d0 16 4 _GET_RTERRMSG
-FUNC 4858 10 4 _GET_RTERRMSG
-FUNC 6410 7 4 _GET_RTERRMSG
+FUNC 1b78 4 0 _GET_RTERRMSG
+FUNC 2888 9 0 _GET_RTERRMSG
+FUNC 44d0 16 0 _GET_RTERRMSG
+FUNC 4858 10 0 _GET_RTERRMSG
+FUNC 6410 7 0 _GET_RTERRMSG
 6410 5 165 4012
 6415 2 168 4012
 44d0 16 169 4012
@@ -626,29 +626,29 @@ FUNC 6410 7 4 _GET_RTERRMSG
 1b7a 2 173 4012
 2888 7 170 4012
 288f 2 173 4012
-FUNC 11c4 12 4 _NMSG_WRITE
-FUNC 2028 16 4 _NMSG_WRITE
-FUNC 20c0 12 4 _NMSG_WRITE
-FUNC 2460 f 4 _NMSG_WRITE
-FUNC 2648 f 4 _NMSG_WRITE
-FUNC 26c4 1a 4 _NMSG_WRITE
-FUNC 349c 27 4 _NMSG_WRITE
-FUNC 43a4 1e 4 _NMSG_WRITE
-FUNC 4428 a 4 _NMSG_WRITE
-FUNC 47c0 2b 4 _NMSG_WRITE
-FUNC 49a4 18 4 _NMSG_WRITE
-FUNC 4a64 1c 4 _NMSG_WRITE
-FUNC 4d50 17 4 _NMSG_WRITE
-FUNC 4e7c 39 4 _NMSG_WRITE
-FUNC 4f5c 2 4 _NMSG_WRITE
-FUNC 5810 25 4 _NMSG_WRITE
-FUNC 59cc 16 4 _NMSG_WRITE
-FUNC 5d18 34 4 _NMSG_WRITE
-FUNC 64e8 5 4 _NMSG_WRITE
-FUNC 6648 7 4 _NMSG_WRITE
-FUNC 6678 22 4 _NMSG_WRITE
-FUNC 6894 11 4 _NMSG_WRITE
-FUNC 70ac 18 4 _NMSG_WRITE
+FUNC 11c4 12 0 _NMSG_WRITE
+FUNC 2028 16 0 _NMSG_WRITE
+FUNC 20c0 12 0 _NMSG_WRITE
+FUNC 2460 f 0 _NMSG_WRITE
+FUNC 2648 f 0 _NMSG_WRITE
+FUNC 26c4 1a 0 _NMSG_WRITE
+FUNC 349c 27 0 _NMSG_WRITE
+FUNC 43a4 1e 0 _NMSG_WRITE
+FUNC 4428 a 0 _NMSG_WRITE
+FUNC 47c0 2b 0 _NMSG_WRITE
+FUNC 49a4 18 0 _NMSG_WRITE
+FUNC 4a64 1c 0 _NMSG_WRITE
+FUNC 4d50 17 0 _NMSG_WRITE
+FUNC 4e7c 39 0 _NMSG_WRITE
+FUNC 4f5c 2 0 _NMSG_WRITE
+FUNC 5810 25 0 _NMSG_WRITE
+FUNC 59cc 16 0 _NMSG_WRITE
+FUNC 5d18 34 0 _NMSG_WRITE
+FUNC 64e8 5 0 _NMSG_WRITE
+FUNC 6648 7 0 _NMSG_WRITE
+FUNC 6678 22 0 _NMSG_WRITE
+FUNC 6894 11 0 _NMSG_WRITE
+FUNC 70ac 18 0 _NMSG_WRITE
 4e7c 1b 196 4012
 4e97 8 197 4012
 4e9f 16 199 4012
@@ -689,45 +689,45 @@ FUNC 5ac8 13 0 _FF_MSGBANNER
 4ab4 a 140 4012
 4abe c 141 4012
 1984 1 143 4012
-FUNC 1490 10 8 _XcptFilter
-FUNC 1540 3 8 _XcptFilter
-FUNC 1720 14 8 _XcptFilter
-FUNC 174c 1b 8 _XcptFilter
-FUNC 19d8 2 8 _XcptFilter
-FUNC 2054 3 8 _XcptFilter
-FUNC 2218 9 8 _XcptFilter
-FUNC 2440 c 8 _XcptFilter
-FUNC 2870 e 8 _XcptFilter
-FUNC 2928 c 8 _XcptFilter
-FUNC 2ae8 11 8 _XcptFilter
-FUNC 2d78 10 8 _XcptFilter
-FUNC 356c f 8 _XcptFilter
-FUNC 38a8 10 8 _XcptFilter
-FUNC 3ed0 10 8 _XcptFilter
-FUNC 3fa4 10 8 _XcptFilter
-FUNC 44e8 7 8 _XcptFilter
-FUNC 4810 17 8 _XcptFilter
-FUNC 4cc8 c 8 _XcptFilter
-FUNC 4f50 7 8 _XcptFilter
-FUNC 5564 e 8 _XcptFilter
-FUNC 56d4 10 8 _XcptFilter
-FUNC 57a4 e 8 _XcptFilter
-FUNC 59f8 16 8 _XcptFilter
-FUNC 5bbc e 8 _XcptFilter
-FUNC 5ca4 10 8 _XcptFilter
-FUNC 5d60 c 8 _XcptFilter
-FUNC 5e38 18 8 _XcptFilter
-FUNC 5e60 10 8 _XcptFilter
-FUNC 6090 c 8 _XcptFilter
-FUNC 61f0 7 8 _XcptFilter
-FUNC 6228 c 8 _XcptFilter
-FUNC 648c c 8 _XcptFilter
-FUNC 64dc 5 8 _XcptFilter
-FUNC 650c 1a 8 _XcptFilter
-FUNC 66a4 c 8 _XcptFilter
-FUNC 68e4 10 8 _XcptFilter
-FUNC 6ee8 3 8 _XcptFilter
-FUNC 6f98 c 8 _XcptFilter
+FUNC 1490 10 0 _XcptFilter
+FUNC 1540 3 0 _XcptFilter
+FUNC 1720 14 0 _XcptFilter
+FUNC 174c 1b 0 _XcptFilter
+FUNC 19d8 2 0 _XcptFilter
+FUNC 2054 3 0 _XcptFilter
+FUNC 2218 9 0 _XcptFilter
+FUNC 2440 c 0 _XcptFilter
+FUNC 2870 e 0 _XcptFilter
+FUNC 2928 c 0 _XcptFilter
+FUNC 2ae8 11 0 _XcptFilter
+FUNC 2d78 10 0 _XcptFilter
+FUNC 356c f 0 _XcptFilter
+FUNC 38a8 10 0 _XcptFilter
+FUNC 3ed0 10 0 _XcptFilter
+FUNC 3fa4 10 0 _XcptFilter
+FUNC 44e8 7 0 _XcptFilter
+FUNC 4810 17 0 _XcptFilter
+FUNC 4cc8 c 0 _XcptFilter
+FUNC 4f50 7 0 _XcptFilter
+FUNC 5564 e 0 _XcptFilter
+FUNC 56d4 10 0 _XcptFilter
+FUNC 57a4 e 0 _XcptFilter
+FUNC 59f8 16 0 _XcptFilter
+FUNC 5bbc e 0 _XcptFilter
+FUNC 5ca4 10 0 _XcptFilter
+FUNC 5d60 c 0 _XcptFilter
+FUNC 5e38 18 0 _XcptFilter
+FUNC 5e60 10 0 _XcptFilter
+FUNC 6090 c 0 _XcptFilter
+FUNC 61f0 7 0 _XcptFilter
+FUNC 6228 c 0 _XcptFilter
+FUNC 648c c 0 _XcptFilter
+FUNC 64dc 5 0 _XcptFilter
+FUNC 650c 1a 0 _XcptFilter
+FUNC 66a4 c 0 _XcptFilter
+FUNC 68e4 10 0 _XcptFilter
+FUNC 6ee8 3 0 _XcptFilter
+FUNC 6f98 c 0 _XcptFilter
 650c 6 195 2369
 6512 7 202 2369
 6519 d 203 2369
@@ -810,61 +810,61 @@ FUNC 4139 dc 0 _setenvp
 41fc 7 130 3838
 4203 5 131 3838
 4208 d 133 3838
-FUNC 1018 8 c parse_cmdline
-FUNC 19b4 e c parse_cmdline
-FUNC 19f4 2 c parse_cmdline
-FUNC 1dd0 14 c parse_cmdline
-FUNC 1fac 28 c parse_cmdline
-FUNC 2058 f c parse_cmdline
-FUNC 209c 9 c parse_cmdline
-FUNC 2364 1a c parse_cmdline
-FUNC 253c 4 c parse_cmdline
-FUNC 2598 9 c parse_cmdline
-FUNC 25cc 10 c parse_cmdline
-FUNC 2718 b c parse_cmdline
-FUNC 2730 e c parse_cmdline
-FUNC 28a8 a c parse_cmdline
-FUNC 28fc 2 c parse_cmdline
-FUNC 290c 14 c parse_cmdline
-FUNC 2b34 f c parse_cmdline
-FUNC 2bfc 10 c parse_cmdline
-FUNC 2d88 7 c parse_cmdline
-FUNC 3730 d c parse_cmdline
-FUNC 377c 2 c parse_cmdline
-FUNC 37b0 10 c parse_cmdline
-FUNC 3c38 24 c parse_cmdline
-FUNC 3c84 10 c parse_cmdline
-FUNC 3db8 1b c parse_cmdline
-FUNC 3e90 e c parse_cmdline
-FUNC 3efc 13 c parse_cmdline
-FUNC 4110 12 c parse_cmdline
-FUNC 42dc f c parse_cmdline
-FUNC 42f0 10 c parse_cmdline
-FUNC 4518 6 c parse_cmdline
-FUNC 4610 7 c parse_cmdline
-FUNC 4684 11 c parse_cmdline
-FUNC 46f8 13 c parse_cmdline
-FUNC 4848 a c parse_cmdline
-FUNC 4994 f c parse_cmdline
-FUNC 49bc e c parse_cmdline
-FUNC 4aac 1 c parse_cmdline
-FUNC 4cb8 f c parse_cmdline
-FUNC 4ed8 24 c parse_cmdline
-FUNC 4f10 3 c parse_cmdline
-FUNC 4f30 e c parse_cmdline
-FUNC 501c 10 c parse_cmdline
-FUNC 5518 3 c parse_cmdline
-FUNC 569c 3 c parse_cmdline
-FUNC 57bc 12 c parse_cmdline
-FUNC 5a50 10 c parse_cmdline
-FUNC 5cc0 14 c parse_cmdline
-FUNC 5e84 f c parse_cmdline
-FUNC 6448 f c parse_cmdline
-FUNC 6530 e c parse_cmdline
-FUNC 66b0 13 c parse_cmdline
-FUNC 6970 4 c parse_cmdline
-FUNC 6aec 7 c parse_cmdline
-FUNC 6f30 e c parse_cmdline
+FUNC 1018 8 0 parse_cmdline
+FUNC 19b4 e 0 parse_cmdline
+FUNC 19f4 2 0 parse_cmdline
+FUNC 1dd0 14 0 parse_cmdline
+FUNC 1fac 28 0 parse_cmdline
+FUNC 2058 f 0 parse_cmdline
+FUNC 209c 9 0 parse_cmdline
+FUNC 2364 1a 0 parse_cmdline
+FUNC 253c 4 0 parse_cmdline
+FUNC 2598 9 0 parse_cmdline
+FUNC 25cc 10 0 parse_cmdline
+FUNC 2718 b 0 parse_cmdline
+FUNC 2730 e 0 parse_cmdline
+FUNC 28a8 a 0 parse_cmdline
+FUNC 28fc 2 0 parse_cmdline
+FUNC 290c 14 0 parse_cmdline
+FUNC 2b34 f 0 parse_cmdline
+FUNC 2bfc 10 0 parse_cmdline
+FUNC 2d88 7 0 parse_cmdline
+FUNC 3730 d 0 parse_cmdline
+FUNC 377c 2 0 parse_cmdline
+FUNC 37b0 10 0 parse_cmdline
+FUNC 3c38 24 0 parse_cmdline
+FUNC 3c84 10 0 parse_cmdline
+FUNC 3db8 1b 0 parse_cmdline
+FUNC 3e90 e 0 parse_cmdline
+FUNC 3efc 13 0 parse_cmdline
+FUNC 4110 12 0 parse_cmdline
+FUNC 42dc f 0 parse_cmdline
+FUNC 42f0 10 0 parse_cmdline
+FUNC 4518 6 0 parse_cmdline
+FUNC 4610 7 0 parse_cmdline
+FUNC 4684 11 0 parse_cmdline
+FUNC 46f8 13 0 parse_cmdline
+FUNC 4848 a 0 parse_cmdline
+FUNC 4994 f 0 parse_cmdline
+FUNC 49bc e 0 parse_cmdline
+FUNC 4aac 1 0 parse_cmdline
+FUNC 4cb8 f 0 parse_cmdline
+FUNC 4ed8 24 0 parse_cmdline
+FUNC 4f10 3 0 parse_cmdline
+FUNC 4f30 e 0 parse_cmdline
+FUNC 501c 10 0 parse_cmdline
+FUNC 5518 3 0 parse_cmdline
+FUNC 569c 3 0 parse_cmdline
+FUNC 57bc 12 0 parse_cmdline
+FUNC 5a50 10 0 parse_cmdline
+FUNC 5cc0 14 0 parse_cmdline
+FUNC 5e84 f 0 parse_cmdline
+FUNC 6448 f 0 parse_cmdline
+FUNC 6530 e 0 parse_cmdline
+FUNC 66b0 13 0 parse_cmdline
+FUNC 6970 4 0 parse_cmdline
+FUNC 6aec 7 0 parse_cmdline
+FUNC 6f30 e 0 parse_cmdline
 1fac 6 221 3891
 1fb2 9 229 3891
 1fbb 2 232 3891
@@ -1173,7 +1173,7 @@ FUNC 5e0c e 0 _mtterm
 5e0c 7 343 3774
 5e13 7 344 3774
 5b84 5 352 3774
-FUNC 10ca b4 8 _initptd
+FUNC 10ca b4 0 _initptd
 10ca c 379 3774
 10d6 b 381 3774
 10e1 a 384 3774
@@ -1326,32 +1326,32 @@ FUNC 472c 1e 0 _heap_init
 4749 1 60 453
 FUNC 503b 45 0 _SEH_prolog4
 FUNC 5080 14 0 _SEH_epilog4
-FUNC 10b0 1a 10 _except_handler4
-FUNC 1180 c 10 _except_handler4
-FUNC 1528 17 10 _except_handler4
-FUNC 1734 10 10 _except_handler4
-FUNC 1768 2c 10 _except_handler4
-FUNC 210c 10 10 _except_handler4
-FUNC 267c 13 10 _except_handler4
-FUNC 2bd0 20 10 _except_handler4
-FUNC 3270 a 10 _except_handler4
-FUNC 3754 13 10 _except_handler4
-FUNC 3b48 36 10 _except_handler4
-FUNC 3d54 3 10 _except_handler4
-FUNC 3f88 c 10 _except_handler4
-FUNC 42b4 d 10 _except_handler4
-FUNC 4f40 10 10 _except_handler4
-FUNC 5a60 1c 10 _except_handler4
-FUNC 5a84 22 10 _except_handler4
-FUNC 5d88 d 10 _except_handler4
-FUNC 5e70 f 10 _except_handler4
-FUNC 5f50 12 10 _except_handler4
-FUNC 5fcc 12 10 _except_handler4
-FUNC 61bc 1d 10 _except_handler4
-FUNC 6670 3 10 _except_handler4
-FUNC 6a80 14 10 _except_handler4
-FUNC 6b0c 20 10 _except_handler4
-FUNC 6cd8 10 10 _except_handler4
+FUNC 10b0 1a 0 _except_handler4
+FUNC 1180 c 0 _except_handler4
+FUNC 1528 17 0 _except_handler4
+FUNC 1734 10 0 _except_handler4
+FUNC 1768 2c 0 _except_handler4
+FUNC 210c 10 0 _except_handler4
+FUNC 267c 13 0 _except_handler4
+FUNC 2bd0 20 0 _except_handler4
+FUNC 3270 a 0 _except_handler4
+FUNC 3754 13 0 _except_handler4
+FUNC 3b48 36 0 _except_handler4
+FUNC 3d54 3 0 _except_handler4
+FUNC 3f88 c 0 _except_handler4
+FUNC 42b4 d 0 _except_handler4
+FUNC 4f40 10 0 _except_handler4
+FUNC 5a60 1c 0 _except_handler4
+FUNC 5a84 22 0 _except_handler4
+FUNC 5d88 d 0 _except_handler4
+FUNC 5e70 f 0 _except_handler4
+FUNC 5f50 12 0 _except_handler4
+FUNC 5fcc 12 0 _except_handler4
+FUNC 61bc 1d 0 _except_handler4
+FUNC 6670 3 0 _except_handler4
+FUNC 6a80 14 0 _except_handler4
+FUNC 6b0c 20 0 _except_handler4
+FUNC 6cd8 10 0 _except_handler4
 FUNC 2244 2f 0 __security_init_cookie
 FUNC 2740 48 0 __security_init_cookie
 FUNC 33e4 d 0 __security_init_cookie
@@ -1382,11 +1382,11 @@ FUNC 6610 c 0 __security_init_cookie
 4396 9 173 1455
 61a4 2 173 1455
 61a6 2 175 1455
-FUNC 4570 f 4 _initp_misc_invarg
+FUNC 4570 f 0 _initp_misc_invarg
 4570 5 64 3583
 4575 8 65 3583
 457d 2 66 3583
-FUNC 3a1f 129 c _call_reportfault
+FUNC 3a1f 129 0 _call_reportfault
 3a1f 16 164 3583
 3a35 9 166 3583
 3a3e 7 167 3583
@@ -1418,12 +1418,12 @@ FUNC 3a1f 129 c _call_reportfault
 3b26 d 254 3583
 3b33 7 255 3583
 3b3a e 257 3583
-FUNC 5c38 25 14 _invoke_watson
+FUNC 5c38 25 0 _invoke_watson
 5c38 3 146 3583
 5c3b 12 155 3583
 5c4d f 156 3583
 5c5c 1 157 3583
-FUNC 6922 2d 14 _invalid_parameter
+FUNC 6922 2d 0 _invalid_parameter
 6922 5 96 3583
 6927 c 103 3583
 6933 4 104 3583
@@ -1475,11 +1475,11 @@ FUNC 6b90 10 0 _mtdeletelocks
 4350 3 220 3954
 46e4 14 214 3954
 5ec4 3 223 3954
-FUNC 4218 17 4 _unlock
+FUNC 4218 17 0 _unlock
 4218 5 370 3954
 421d 10 374 3954
 422d 2 375 3954
-FUNC 3ff7 c2 4 _mtinitlocknum
+FUNC 3ff7 c2 0 _mtinitlocknum
 3ff7 c 258 3954
 4003 6 260 3954
 4009 a 268 3954
@@ -1506,11 +1506,11 @@ FUNC 3ff7 c2 4 _mtinitlocknum
 40a7 3 303 3954
 40aa 6 304 3954
 40b0 9 300 3954
-FUNC 118c b 4 _lock
-FUNC 1af0 14 4 _lock
-FUNC 3718 7 4 _lock
-FUNC 44a0 1f 4 _lock
-FUNC 5bb4 1 4 _lock
+FUNC 118c b 0 _lock
+FUNC 1af0 14 0 _lock
+FUNC 3718 7 0 _lock
+FUNC 44a0 1f 0 _lock
+FUNC 5bb4 1 0 _lock
 44a0 5 332 3954
 44a5 1a 337 3954
 1af0 14 339 3954
@@ -1518,19 +1518,19 @@ FUNC 5bb4 1 4 _lock
 5bb4 1 340 3954
 118c 9 347 3954
 1195 2 348 3954
-FUNC 14ac 10 c strcpy_s
-FUNC 1990 c c strcpy_s
-FUNC 1da4 c c strcpy_s
-FUNC 2580 18 c strcpy_s
-FUNC 2e00 4 c strcpy_s
-FUNC 4674 10 c strcpy_s
-FUNC 470c 4 c strcpy_s
-FUNC 4794 2 c strcpy_s
-FUNC 4d40 e c strcpy_s
-FUNC 59b8 14 c strcpy_s
-FUNC 6158 14 c strcpy_s
-FUNC 6a94 7 c strcpy_s
-FUNC 6c8c a c strcpy_s
+FUNC 14ac 10 0 strcpy_s
+FUNC 1990 c 0 strcpy_s
+FUNC 1da4 c 0 strcpy_s
+FUNC 2580 18 0 strcpy_s
+FUNC 2e00 4 0 strcpy_s
+FUNC 4674 10 0 strcpy_s
+FUNC 470c 4 0 strcpy_s
+FUNC 4794 2 0 strcpy_s
+FUNC 4d40 e 0 strcpy_s
+FUNC 59b8 14 0 strcpy_s
+FUNC 6158 14 0 strcpy_s
+FUNC 6a94 7 0 strcpy_s
+FUNC 6c8c a 0 strcpy_s
 2580 5 13 2523
 1da4 c 18 2523
 2585 13 18 2523
@@ -1547,7 +1547,7 @@ FUNC 6c8c a c strcpy_s
 470c 2 33 2523
 4794 2 33 2523
 470e 2 34 2523
-FUNC 37f0 8b 4 strlen
+FUNC 37f0 8b 0 strlen
 37f0 0 54 2796
 37f0 4 63 2796
 37f4 6 64 2796
@@ -1593,23 +1593,23 @@ FUNC 37f0 8b 4 strlen
 3874 4 119 2796
 3878 2 120 2796
 387a 1 121 2796
-FUNC 14a0 7 4 malloc
-FUNC 22f4 3 4 malloc
-FUNC 2838 e 4 malloc
-FUNC 28e4 7 4 malloc
-FUNC 2da4 a 4 malloc
-FUNC 34d0 8 4 malloc
-FUNC 3d5c 16 4 malloc
-FUNC 4580 13 4 malloc
-FUNC 4a4c 3 4 malloc
-FUNC 4cf8 14 4 malloc
-FUNC 4eb8 1f 4 malloc
-FUNC 5a48 6 4 malloc
-FUNC 5b20 18 4 malloc
-FUNC 5b8c 14 4 malloc
-FUNC 5df8 14 4 malloc
-FUNC 60ec 2 4 malloc
-FUNC 65a0 2 4 malloc
+FUNC 14a0 7 0 malloc
+FUNC 22f4 3 0 malloc
+FUNC 2838 e 0 malloc
+FUNC 28e4 7 0 malloc
+FUNC 2da4 a 0 malloc
+FUNC 34d0 8 0 malloc
+FUNC 3d5c 16 0 malloc
+FUNC 4580 13 0 malloc
+FUNC 4a4c 3 0 malloc
+FUNC 4cf8 14 0 malloc
+FUNC 4eb8 1f 0 malloc
+FUNC 5a48 6 0 malloc
+FUNC 5b20 18 0 malloc
+FUNC 5b8c 14 0 malloc
+FUNC 5df8 14 0 malloc
+FUNC 60ec 2 0 malloc
+FUNC 65a0 2 0 malloc
 5b20 6 81 504
 5b26 12 85 504
 60ec 2 85 504
@@ -1639,12 +1639,12 @@ FUNC 2a6e 17 0 _EH4_CallFilterFunc
 FUNC 2a85 19 0 _EH4_TransferToHandler
 FUNC 2a9e 19 0 _EH4_GlobalUnwind2
 FUNC 2ab7 17 8 _EH4_LocalUnwind
-FUNC 1480 5 4 _get_errno_from_oserr
-FUNC 23bc 13 4 _get_errno_from_oserr
-FUNC 3510 12 4 _get_errno_from_oserr
-FUNC 5ec8 10 4 _get_errno_from_oserr
-FUNC 5f78 a 4 _get_errno_from_oserr
-FUNC 6ab4 1f 4 _get_errno_from_oserr
+FUNC 1480 5 0 _get_errno_from_oserr
+FUNC 23bc 13 0 _get_errno_from_oserr
+FUNC 3510 12 0 _get_errno_from_oserr
+FUNC 5ec8 10 0 _get_errno_from_oserr
+FUNC 5f78 a 0 _get_errno_from_oserr
+FUNC 6ab4 1f 0 _get_errno_from_oserr
 5f78 5 119 224
 5f7d 5 123 224
 23bc 13 124 224
@@ -1677,24 +1677,24 @@ FUNC 4638 39 0 terminate()
 465f 7 106 4591
 4666 5 114 4591
 466b 6 115 4591
-FUNC 4834 11 4 _initp_eh_hooks
+FUNC 4834 11 0 _initp_eh_hooks
 4834 0 69 4591
 4834 10 70 4591
 4844 1 71 4591
-FUNC 15b8 1e 4 _initp_misc_winsig
+FUNC 15b8 1e 0 _initp_misc_winsig
 15b8 5 57 2311
 15bd 8 58 2311
 15c5 5 59 2311
 15ca 5 60 2311
 15cf 5 61 2311
 15d4 2 62 2311
-FUNC 15d8 18 4 siglookup
-FUNC 3538 f 4 siglookup
-FUNC 42c8 14 4 siglookup
-FUNC 45c8 2 4 siglookup
-FUNC 4e1c f 4 siglookup
-FUNC 55f0 2 4 siglookup
-FUNC 63ac f 4 siglookup
+FUNC 15d8 18 0 siglookup
+FUNC 3538 f 0 siglookup
+FUNC 42c8 14 0 siglookup
+FUNC 45c8 2 0 siglookup
+FUNC 4e1c f 0 siglookup
+FUNC 55f0 2 0 siglookup
+FUNC 63ac f 0 siglookup
 63ac 5 629 2311
 63b1 a 630 2311
 15d8 18 639 2311
@@ -1708,7 +1708,7 @@ FUNC 3708 d 0 __get_sigabrt
 3708 0 669 2311
 3708 c 670 2311
 3714 1 671 2311
-FUNC 17d8 1a3 4 raise
+FUNC 17d8 1a3 0 raise
 17d8 c 450 2311
 17e4 5 457 2311
 17e9 3 458 2311
@@ -1762,22 +1762,22 @@ FUNC 17d8 1a3 4 raise
 196d 6 600 2311
 1973 2 603 2311
 1975 6 604 2311
-FUNC 502c f 4 _initp_misc_rand_s
+FUNC 502c f 0 _initp_misc_rand_s
 502c 5 58 2186
 5031 8 59 2186
 5039 2 60 2186
-FUNC 2848 f 4 _initp_misc_purevirt
+FUNC 2848 f 0 _initp_misc_purevirt
 2848 5 179 1627
 284d 8 180 1627
 2855 2 181 1627
-FUNC 6fd0 f 4 _initp_heap_handler
+FUNC 6fd0 f 0 _initp_heap_handler
 6fd0 5 31 2820
 6fd5 8 32 2820
 6fdd 2 33 2820
-FUNC 1660 14 4 _callnewh
-FUNC 5708 1f 4 _callnewh
-FUNC 60b0 4 4 _callnewh
-FUNC 6c18 5 4 _callnewh
+FUNC 1660 14 0 _callnewh
+FUNC 5708 1f 0 _callnewh
+FUNC 60b0 4 0 _callnewh
+FUNC 6c18 5 0 _callnewh
 5708 5 131 2820
 570d c 133 2820
 1660 14 135 2820
@@ -1786,19 +1786,19 @@ FUNC 6c18 5 4 _callnewh
 6c1b 2 139 2820
 60b0 2 136 2820
 60b2 2 139 2820
-FUNC 2274 12 4 _onexit_nolock
-FUNC 2484 10 4 _onexit_nolock
-FUNC 2640 2 4 _onexit_nolock
-FUNC 2b88 10 4 _onexit_nolock
-FUNC 32ac 13 4 _onexit_nolock
-FUNC 4124 15 4 _onexit_nolock
-FUNC 43e8 33 4 _onexit_nolock
-FUNC 45f8 18 4 _onexit_nolock
-FUNC 4a2c 20 4 _onexit_nolock
-FUNC 4b68 2 4 _onexit_nolock
-FUNC 4bb8 18 4 _onexit_nolock
-FUNC 4d84 5 4 _onexit_nolock
-FUNC 6a0c 1a 4 _onexit_nolock
+FUNC 2274 12 0 _onexit_nolock
+FUNC 2484 10 0 _onexit_nolock
+FUNC 2640 2 0 _onexit_nolock
+FUNC 2b88 10 0 _onexit_nolock
+FUNC 32ac 13 0 _onexit_nolock
+FUNC 4124 15 0 _onexit_nolock
+FUNC 43e8 33 0 _onexit_nolock
+FUNC 45f8 18 0 _onexit_nolock
+FUNC 4a2c 20 0 _onexit_nolock
+FUNC 4b68 2 0 _onexit_nolock
+FUNC 4bb8 18 0 _onexit_nolock
+FUNC 4d84 5 0 _onexit_nolock
+FUNC 6a0c 1a 0 _onexit_nolock
 43e8 8 100 1969
 43f0 f 103 1969
 43ff f 104 1969
@@ -1833,7 +1833,7 @@ FUNC 318c 5 0 __onexitinit
 2658 3 214 1969
 265b 3 216 1969
 265e 1 217 1969
-FUNC 157b 3c 4 _onexit
+FUNC 157b 3c 0 _onexit
 157b c 81 1969
 1587 5 84 1969
 158c 4 86 1969
@@ -1842,7 +1842,7 @@ FUNC 157b 3c 4 _onexit
 15a8 3 93 1969
 15ab 6 94 1969
 15b1 6 90 1969
-FUNC 56a4 17 4 atexit
+FUNC 56a4 17 0 atexit
 56a4 5 161 1969
 56a9 10 162 1969
 56b9 2 163 1969
@@ -1853,10 +1853,10 @@ FUNC 6ebc 6 0 _initp_misc_cfltcvt_tab
 6ec0 2 56 2419
 6b70 20 58 2419
 6154 3 60 2419
-FUNC 4af8 17 4 _ValidateImageBase
-FUNC 4e40 1c 4 _ValidateImageBase
-FUNC 5608 4 4 _ValidateImageBase
-FUNC 585c 12 4 _ValidateImageBase
+FUNC 4af8 17 0 _ValidateImageBase
+FUNC 4e40 1c 0 _ValidateImageBase
+FUNC 5608 4 0 _ValidateImageBase
+FUNC 585c 12 0 _ValidateImageBase
 4e40 5 44 2079
 4e45 17 50 2079
 5608 2 52 2079
@@ -1866,13 +1866,13 @@ FUNC 585c 12 4 _ValidateImageBase
 4b03 c 58 2079
 585c 10 62 2079
 586c 2 68 2079
-FUNC 1234 5 8 _FindPESection
-FUNC 1b2c 2 8 _FindPESection
-FUNC 4948 13 8 _FindPESection
-FUNC 4e08 12 8 _FindPESection
-FUNC 5d9c 10 8 _FindPESection
-FUNC 6d60 3 8 _FindPESection
-FUNC 6fa4 2c 8 _FindPESection
+FUNC 1234 5 0 _FindPESection
+FUNC 1b2c 2 0 _FindPESection
+FUNC 4948 13 0 _FindPESection
+FUNC 4e08 12 0 _FindPESection
+FUNC 5d9c 10 0 _FindPESection
+FUNC 6d60 3 0 _FindPESection
+FUNC 6fa4 2c 0 _FindPESection
 6fa4 5 92 2079
 6fa9 8 99 2079
 6d60 3 108 2079
@@ -1883,7 +1883,7 @@ FUNC 6fa4 2c 8 _FindPESection
 1234 3 123 2079
 1b2c 2 123 2079
 1237 2 124 2079
-FUNC 6fee bc 4 _IsNonwritableInCurrentImage
+FUNC 6fee bc 0 _IsNonwritableInCurrentImage
 6fee 35 149 2079
 7023 7 156 2079
 702a f 164 2079
@@ -1897,29 +1897,29 @@ FUNC 6fee bc 4 _IsNonwritableInCurrentImage
 7079 16 187 2079
 708f 9 193 2079
 7098 12 195 2079
-FUNC 1064 4c c __crtMessageBoxW
-FUNC 123c 1b c __crtMessageBoxW
-FUNC 1460 14 c __crtMessageBoxW
-FUNC 19c4 12 c __crtMessageBoxW
-FUNC 2148 40 c __crtMessageBoxW
-FUNC 2b00 14 c __crtMessageBoxW
-FUNC 31b4 e c __crtMessageBoxW
-FUNC 3290 1a c __crtMessageBoxW
-FUNC 36e8 8 c __crtMessageBoxW
-FUNC 3794 1c c __crtMessageBoxW
-FUNC 474c 1c c __crtMessageBoxW
-FUNC 496c 10 c __crtMessageBoxW
-FUNC 4ca0 10 c __crtMessageBoxW
-FUNC 4d18 1c c __crtMessageBoxW
-FUNC 5640 2 c __crtMessageBoxW
-FUNC 56e4 16 c __crtMessageBoxW
-FUNC 5cf4 10 c __crtMessageBoxW
-FUNC 5e50 10 c __crtMessageBoxW
-FUNC 5ee8 13 c __crtMessageBoxW
-FUNC 5f18 c c __crtMessageBoxW
-FUNC 6f6c f c __crtMessageBoxW
-FUNC 6f7c 14 c __crtMessageBoxW
-FUNC 70d4 10 c __crtMessageBoxW
+FUNC 1064 4c 0 __crtMessageBoxW
+FUNC 123c 1b 0 __crtMessageBoxW
+FUNC 1460 14 0 __crtMessageBoxW
+FUNC 19c4 12 0 __crtMessageBoxW
+FUNC 2148 40 0 __crtMessageBoxW
+FUNC 2b00 14 0 __crtMessageBoxW
+FUNC 31b4 e 0 __crtMessageBoxW
+FUNC 3290 1a 0 __crtMessageBoxW
+FUNC 36e8 8 0 __crtMessageBoxW
+FUNC 3794 1c 0 __crtMessageBoxW
+FUNC 474c 1c 0 __crtMessageBoxW
+FUNC 496c 10 0 __crtMessageBoxW
+FUNC 4ca0 10 0 __crtMessageBoxW
+FUNC 4d18 1c 0 __crtMessageBoxW
+FUNC 5640 2 0 __crtMessageBoxW
+FUNC 56e4 16 0 __crtMessageBoxW
+FUNC 5cf4 10 0 __crtMessageBoxW
+FUNC 5e50 10 0 __crtMessageBoxW
+FUNC 5ee8 13 0 __crtMessageBoxW
+FUNC 5f18 c 0 __crtMessageBoxW
+FUNC 6f6c f 0 __crtMessageBoxW
+FUNC 6f7c 14 0 __crtMessageBoxW
+FUNC 70d4 10 0 __crtMessageBoxW
 2148 12 41 1053
 215a 14 49 1053
 216e 4 56 1053
@@ -1961,21 +1961,21 @@ FUNC 70d4 10 c __crtMessageBoxW
 2b00 14 158 1053
 5640 2 163 1053
 6f6c f 166 1053
-FUNC 21d0 14 c wcscat_s
-FUNC 28c0 10 c wcscat_s
-FUNC 3784 a c wcscat_s
-FUNC 3d78 18 c wcscat_s
-FUNC 4880 18 c wcscat_s
-FUNC 48bc b c wcscat_s
-FUNC 4b7c 10 c wcscat_s
-FUNC 4f58 4 c wcscat_s
-FUNC 5448 e c wcscat_s
-FUNC 55d8 12 c wcscat_s
-FUNC 5f9c 2 c wcscat_s
-FUNC 5fb4 7 c wcscat_s
-FUNC 6054 c c wcscat_s
-FUNC 6194 10 c wcscat_s
-FUNC 6d50 10 c wcscat_s
+FUNC 21d0 14 0 wcscat_s
+FUNC 28c0 10 0 wcscat_s
+FUNC 3784 a 0 wcscat_s
+FUNC 3d78 18 0 wcscat_s
+FUNC 4880 18 0 wcscat_s
+FUNC 48bc b 0 wcscat_s
+FUNC 4b7c 10 0 wcscat_s
+FUNC 4f58 4 0 wcscat_s
+FUNC 5448 e 0 wcscat_s
+FUNC 55d8 12 0 wcscat_s
+FUNC 5f9c 2 0 wcscat_s
+FUNC 5fb4 7 0 wcscat_s
+FUNC 6054 c 0 wcscat_s
+FUNC 6194 10 0 wcscat_s
+FUNC 6d50 10 0 wcscat_s
 3d78 6 13 2468
 3784 a 18 2468
 3d7e 12 18 2468
@@ -1997,33 +1997,33 @@ FUNC 6d50 10 c wcscat_s
 21d0 3 41 2468
 4b7c 10 41 2468
 21d3 11 42 2468
-FUNC 103c c 10 wcsncpy_s
-FUNC 11d8 10 10 wcsncpy_s
-FUNC 12fc b 10 wcsncpy_s
-FUNC 1ae0 e 10 wcsncpy_s
-FUNC 1b4c f 10 wcsncpy_s
-FUNC 1e0c 5 10 wcsncpy_s
-FUNC 21e4 10 10 wcsncpy_s
-FUNC 228c 4 10 wcsncpy_s
-FUNC 22b0 c 10 wcsncpy_s
-FUNC 3720 e 10 wcsncpy_s
-FUNC 37c0 b 10 wcsncpy_s
-FUNC 43d4 14 10 wcsncpy_s
-FUNC 46c8 10 10 wcsncpy_s
-FUNC 4828 c 10 wcsncpy_s
-FUNC 495c a 10 wcsncpy_s
-FUNC 49dc 34 10 wcsncpy_s
-FUNC 4c38 2 10 wcsncpy_s
-FUNC 4c84 5 10 wcsncpy_s
-FUNC 5a38 5 10 wcsncpy_s
-FUNC 5dc8 c 10 wcsncpy_s
-FUNC 61e0 e 10 wcsncpy_s
-FUNC 6288 4 10 wcsncpy_s
-FUNC 63e0 d 10 wcsncpy_s
-FUNC 6a28 10 10 wcsncpy_s
-FUNC 6af4 18 10 wcsncpy_s
-FUNC 6c3c e 10 wcsncpy_s
-FUNC 70c4 10 10 wcsncpy_s
+FUNC 103c c 0 wcsncpy_s
+FUNC 11d8 10 0 wcsncpy_s
+FUNC 12fc b 0 wcsncpy_s
+FUNC 1ae0 e 0 wcsncpy_s
+FUNC 1b4c f 0 wcsncpy_s
+FUNC 1e0c 5 0 wcsncpy_s
+FUNC 21e4 10 0 wcsncpy_s
+FUNC 228c 4 0 wcsncpy_s
+FUNC 22b0 c 0 wcsncpy_s
+FUNC 3720 e 0 wcsncpy_s
+FUNC 37c0 b 0 wcsncpy_s
+FUNC 43d4 14 0 wcsncpy_s
+FUNC 46c8 10 0 wcsncpy_s
+FUNC 4828 c 0 wcsncpy_s
+FUNC 495c a 0 wcsncpy_s
+FUNC 49dc 34 0 wcsncpy_s
+FUNC 4c38 2 0 wcsncpy_s
+FUNC 4c84 5 0 wcsncpy_s
+FUNC 5a38 5 0 wcsncpy_s
+FUNC 5dc8 c 0 wcsncpy_s
+FUNC 61e0 e 0 wcsncpy_s
+FUNC 6288 4 0 wcsncpy_s
+FUNC 63e0 d 0 wcsncpy_s
+FUNC 6a28 10 0 wcsncpy_s
+FUNC 6af4 18 0 wcsncpy_s
+FUNC 6c3c e 0 wcsncpy_s
+FUNC 70c4 10 0 wcsncpy_s
 49dc 5 13 2578
 1b4c f 17 2578
 49e1 17 17 2578
@@ -2058,25 +2058,25 @@ FUNC 70c4 10 10 wcsncpy_s
 6a2b d 59 2578
 43d4 3 61 2578
 43d7 11 62 2578
-FUNC 20d4 10 4 wcslen
-FUNC 5520 10 4 wcslen
+FUNC 20d4 10 0 wcslen
+FUNC 5520 10 0 wcslen
 20dc 5 41 2728
 20e1 3 42 2728
 5520 10 44 2728
 20d4 6 46 2728
 20da 2 47 2728
-FUNC 15f0 18 c wcscpy_s
-FUNC 17cc c c wcscpy_s
-FUNC 23a0 10 c wcscpy_s
-FUNC 2494 a c wcscpy_s
-FUNC 2858 18 c wcscpy_s
-FUNC 3208 10 c wcscpy_s
-FUNC 3ca8 8 c wcscpy_s
-FUNC 4bd0 10 c wcscpy_s
-FUNC 5530 7 c wcscpy_s
-FUNC 5880 4 c wcscpy_s
-FUNC 5f08 4 c wcscpy_s
-FUNC 5f24 14 c wcscpy_s
+FUNC 15f0 18 0 wcscpy_s
+FUNC 17cc c 0 wcscpy_s
+FUNC 23a0 10 0 wcscpy_s
+FUNC 2494 a 0 wcscpy_s
+FUNC 2858 18 0 wcscpy_s
+FUNC 3208 10 0 wcscpy_s
+FUNC 3ca8 8 0 wcscpy_s
+FUNC 4bd0 10 0 wcscpy_s
+FUNC 5530 7 0 wcscpy_s
+FUNC 5880 4 0 wcscpy_s
+FUNC 5f08 4 0 wcscpy_s
+FUNC 5f24 14 0 wcscpy_s
 15f0 6 13 2523
 15f6 12 18 2523
 23a0 10 18 2523
@@ -2092,12 +2092,12 @@ FUNC 5f24 14 c wcscpy_s
 4bd0 10 29 2523
 5f24 3 29 2523
 5f27 11 30 2523
-FUNC 1268 d 4 _set_error_mode
-FUNC 1b7c 16 4 _set_error_mode
-FUNC 1e04 7 4 _set_error_mode
-FUNC 31c4 f 4 _set_error_mode
-FUNC 49cc f 4 _set_error_mode
-FUNC 5eac 15 4 _set_error_mode
+FUNC 1268 d 0 _set_error_mode
+FUNC 1b7c 16 0 _set_error_mode
+FUNC 1e04 7 0 _set_error_mode
+FUNC 31c4 f 0 _set_error_mode
+FUNC 49cc f 0 _set_error_mode
+FUNC 5eac 15 0 _set_error_mode
 1b7c 5 43 1181
 1b81 11 46 1181
 31c4 f 46 1181
@@ -2115,13 +2115,13 @@ FUNC 1275 f 0 __security_check_cookie
 127b 2 56 892
 127d 2 57 892
 127f 5 59 892
-FUNC 1488 6 4 _malloc_crt
-FUNC 1b04 12 4 _malloc_crt
-FUNC 1d3c 3 4 _malloc_crt
-FUNC 5fe0 1f 4 _malloc_crt
-FUNC 69d4 9 4 _malloc_crt
-FUNC 6c64 18 4 _malloc_crt
-FUNC 6f40 10 4 _malloc_crt
+FUNC 1488 6 0 _malloc_crt
+FUNC 1b04 12 0 _malloc_crt
+FUNC 1d3c 3 0 _malloc_crt
+FUNC 5fe0 1f 0 _malloc_crt
+FUNC 69d4 9 0 _malloc_crt
+FUNC 6c64 18 0 _malloc_crt
+FUNC 6f40 10 0 _malloc_crt
 69d4 7 39 333
 69db 2 40 333
 6c64 b 44 333
@@ -2133,13 +2133,13 @@ FUNC 6f40 10 4 _malloc_crt
 6f42 e 47 333
 1488 4 50 333
 148c 2 51 333
-FUNC 3cd8 10 8 _calloc_crt
-FUNC 541c 12 8 _calloc_crt
-FUNC 553c 6 8 _calloc_crt
-FUNC 5598 9 8 _calloc_crt
-FUNC 6950 3 8 _calloc_crt
-FUNC 6ec8 1f 8 _calloc_crt
-FUNC 6ef0 20 8 _calloc_crt
+FUNC 3cd8 10 0 _calloc_crt
+FUNC 541c 12 0 _calloc_crt
+FUNC 553c 6 0 _calloc_crt
+FUNC 5598 9 0 _calloc_crt
+FUNC 6950 3 0 _calloc_crt
+FUNC 6ec8 1f 0 _calloc_crt
+FUNC 6ef0 20 0 _calloc_crt
 5598 7 54 333
 559f 2 55 333
 6ef0 12 61 333
@@ -2151,14 +2151,14 @@ FUNC 6ef0 20 8 _calloc_crt
 3cda e 64 333
 553c 4 67 333
 5540 2 68 333
-FUNC 2674 3 8 _realloc_crt
-FUNC 2b5c 10 8 _realloc_crt
-FUNC 38b8 6 8 _realloc_crt
-FUNC 435c f 8 _realloc_crt
-FUNC 633c 1c 8 _realloc_crt
-FUNC 6580 1f 8 _realloc_crt
-FUNC 65b0 12 8 _realloc_crt
-FUNC 6f20 9 8 _realloc_crt
+FUNC 2674 3 0 _realloc_crt
+FUNC 2b5c 10 0 _realloc_crt
+FUNC 38b8 6 0 _realloc_crt
+FUNC 435c f 0 _realloc_crt
+FUNC 633c 1c 0 _realloc_crt
+FUNC 6580 1f 0 _realloc_crt
+FUNC 65b0 12 0 _realloc_crt
+FUNC 6f20 9 0 _realloc_crt
 6f20 7 71 333
 6f27 2 72 333
 633c f 76 333
@@ -2290,17 +2290,17 @@ FUNC 2c45 a4 0 __updatetmbcinfo
 2cc8 7 524 3326
 2ccf 11 527 3326
 2ce0 9 529 3326
-FUNC 12b0 8 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 2084 18 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 2314 7 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 2504 27 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 2904 7 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 3558 14 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 4d74 e 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 560c 13 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 5d04 14 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 5f68 a 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
-FUNC 6cbc 1c 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 12b0 8 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 2084 18 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 2314 7 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 2504 27 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 2904 7 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 3558 14 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 4d74 e 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 560c 13 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 5d04 14 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 5f68 a 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 6cbc 1c 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
 6cbc 5 240 111
 6cc1 17 241 111
 2504 8 243 111
@@ -2347,41 +2347,41 @@ FUNC 6f64 2 0 getSystemCP
 4710 f 308 3326
 6f64 2 308 3326
 2b99 2 309 3326
-FUNC 1208 29 8 _setmbcp_nolock
-FUNC 16ac 20 8 _setmbcp_nolock
-FUNC 1bc0 3 8 _setmbcp_nolock
-FUNC 2188 11 8 _setmbcp_nolock
-FUNC 23b0 6 8 _setmbcp_nolock
-FUNC 2894 11 8 _setmbcp_nolock
-FUNC 2b28 7 8 _setmbcp_nolock
-FUNC 330c c 8 _setmbcp_nolock
-FUNC 40bc e 8 _setmbcp_nolock
-FUNC 454c f 8 _setmbcp_nolock
-FUNC 4720 6 8 _setmbcp_nolock
-FUNC 4768 f 8 _setmbcp_nolock
-FUNC 4b58 10 8 _setmbcp_nolock
-FUNC 4c40 c 8 _setmbcp_nolock
-FUNC 5404 12 8 _setmbcp_nolock
-FUNC 5728 2a 8 _setmbcp_nolock
-FUNC 5800 e 8 _setmbcp_nolock
-FUNC 5ab0 17 8 _setmbcp_nolock
-FUNC 5adc 11 8 _setmbcp_nolock
-FUNC 5ba8 c 8 _setmbcp_nolock
-FUNC 5bcc 14 8 _setmbcp_nolock
-FUNC 5fa4 8 8 _setmbcp_nolock
-FUNC 6010 f 8 _setmbcp_nolock
-FUNC 6074 1c 8 _setmbcp_nolock
-FUNC 609c 14 8 _setmbcp_nolock
-FUNC 60c0 2a 8 _setmbcp_nolock
-FUNC 60f4 17 8 _setmbcp_nolock
-FUNC 6358 14 8 _setmbcp_nolock
-FUNC 638c 11 8 _setmbcp_nolock
-FUNC 63d4 5 8 _setmbcp_nolock
-FUNC 64a8 34 8 _setmbcp_nolock
-FUNC 64f0 3 8 _setmbcp_nolock
-FUNC 65c4 18 8 _setmbcp_nolock
-FUNC 6974 7 8 _setmbcp_nolock
-FUNC 6a64 f 8 _setmbcp_nolock
+FUNC 1208 29 0 _setmbcp_nolock
+FUNC 16ac 20 0 _setmbcp_nolock
+FUNC 1bc0 3 0 _setmbcp_nolock
+FUNC 2188 11 0 _setmbcp_nolock
+FUNC 23b0 6 0 _setmbcp_nolock
+FUNC 2894 11 0 _setmbcp_nolock
+FUNC 2b28 7 0 _setmbcp_nolock
+FUNC 330c c 0 _setmbcp_nolock
+FUNC 40bc e 0 _setmbcp_nolock
+FUNC 454c f 0 _setmbcp_nolock
+FUNC 4720 6 0 _setmbcp_nolock
+FUNC 4768 f 0 _setmbcp_nolock
+FUNC 4b58 10 0 _setmbcp_nolock
+FUNC 4c40 c 0 _setmbcp_nolock
+FUNC 5404 12 0 _setmbcp_nolock
+FUNC 5728 2a 0 _setmbcp_nolock
+FUNC 5800 e 0 _setmbcp_nolock
+FUNC 5ab0 17 0 _setmbcp_nolock
+FUNC 5adc 11 0 _setmbcp_nolock
+FUNC 5ba8 c 0 _setmbcp_nolock
+FUNC 5bcc 14 0 _setmbcp_nolock
+FUNC 5fa4 8 0 _setmbcp_nolock
+FUNC 6010 f 0 _setmbcp_nolock
+FUNC 6074 1c 0 _setmbcp_nolock
+FUNC 609c 14 0 _setmbcp_nolock
+FUNC 60c0 2a 0 _setmbcp_nolock
+FUNC 60f4 17 0 _setmbcp_nolock
+FUNC 6358 14 0 _setmbcp_nolock
+FUNC 638c 11 0 _setmbcp_nolock
+FUNC 63d4 5 0 _setmbcp_nolock
+FUNC 64a8 34 0 _setmbcp_nolock
+FUNC 64f0 3 0 _setmbcp_nolock
+FUNC 65c4 18 0 _setmbcp_nolock
+FUNC 6974 7 0 _setmbcp_nolock
+FUNC 6a64 f 0 _setmbcp_nolock
 64a8 17 684 3326
 64bf b 691 3326
 64ca 12 694 3326
@@ -2430,7 +2430,7 @@ FUNC 6a64 f 8 _setmbcp_nolock
 6392 b 795 3326
 64f0 3 744 3326
 4768 f 800 3326
-FUNC 1e11 19a 4 _setmbcp
+FUNC 1e11 19a 0 _setmbcp
 1e11 c 572 3326
 1e1d 4 573 3326
 1e21 a 577 3326
@@ -2486,15 +2486,15 @@ FUNC 6234 13 0 __initmbctable
 5ddc a 853 3326
 165c 2 858 3326
 165e 1 859 3326
-FUNC 1674 7 10 x_ismbbtype_l
-FUNC 1c0c 2c 10 x_ismbbtype_l
-FUNC 3d74 2 10 x_ismbbtype_l
-FUNC 4c90 e 10 x_ismbbtype_l
-FUNC 5430 16 10 x_ismbbtype_l
-FUNC 59b0 2 10 x_ismbbtype_l
-FUNC 6254 10 10 x_ismbbtype_l
-FUNC 643c 3 10 x_ismbbtype_l
-FUNC 6498 10 10 x_ismbbtype_l
+FUNC 1674 7 0 x_ismbbtype_l
+FUNC 1c0c 2c 0 x_ismbbtype_l
+FUNC 3d74 2 0 x_ismbbtype_l
+FUNC 4c90 e 0 x_ismbbtype_l
+FUNC 5430 16 0 x_ismbbtype_l
+FUNC 59b0 2 0 x_ismbbtype_l
+FUNC 6254 10 0 x_ismbbtype_l
+FUNC 643c 3 0 x_ismbbtype_l
+FUNC 6498 10 0 x_ismbbtype_l
 1c0c 8 213 3271
 1c14 b 214 3271
 1c1f 4 219 3271
@@ -2507,26 +2507,26 @@ FUNC 6498 10 10 x_ismbbtype_l
 643c 3 222 3271
 6498 10 222 3271
 3d74 2 223 3271
-FUNC 4930 18 4 _ismbblead
+FUNC 4930 18 0 _ismbblead
 4930 5 171 3271
 4935 11 172 3271
 4946 2 173 3271
-FUNC 1bac 12 4 __addlocaleref
-FUNC 26b4 a 4 __addlocaleref
-FUNC 2880 3 4 __addlocaleref
-FUNC 37d8 3 4 __addlocaleref
-FUNC 3c70 14 4 __addlocaleref
-FUNC 3fe4 13 4 __addlocaleref
-FUNC 4a10 1c 4 __addlocaleref
-FUNC 54d8 10 4 __addlocaleref
-FUNC 54f0 3 4 __addlocaleref
-FUNC 5620 3 4 __addlocaleref
-FUNC 5dac 3 4 __addlocaleref
-FUNC 6040 13 4 __addlocaleref
-FUNC 6278 10 4 __addlocaleref
-FUNC 6478 13 4 __addlocaleref
-FUNC 6540 10 4 __addlocaleref
-FUNC 6d08 28 4 __addlocaleref
+FUNC 1bac 12 0 __addlocaleref
+FUNC 26b4 a 0 __addlocaleref
+FUNC 2880 3 0 __addlocaleref
+FUNC 37d8 3 0 __addlocaleref
+FUNC 3c70 14 0 __addlocaleref
+FUNC 3fe4 13 0 __addlocaleref
+FUNC 4a10 1c 0 __addlocaleref
+FUNC 54d8 10 0 __addlocaleref
+FUNC 54f0 3 0 __addlocaleref
+FUNC 5620 3 0 __addlocaleref
+FUNC 5dac 3 0 __addlocaleref
+FUNC 6040 13 0 __addlocaleref
+FUNC 6278 10 0 __addlocaleref
+FUNC 6478 13 0 __addlocaleref
+FUNC 6540 10 0 __addlocaleref
+FUNC 6d08 28 0 __addlocaleref
 6d08 7 36 1913
 6d0f d 39 1913
 6d1c 14 41 1913
@@ -2547,24 +2547,24 @@ FUNC 6d08 28 4 __addlocaleref
 1bac 12 53 1913
 6040 11 63 1913
 6051 2 64 1913
-FUNC 2328 a 4 __removelocaleref
-FUNC 252c 10 4 __removelocaleref
-FUNC 2b14 14 4 __removelocaleref
-FUNC 34c8 3 4 __removelocaleref
-FUNC 3d44 10 4 __removelocaleref
-FUNC 4c00 13 4 __removelocaleref
-FUNC 4f70 14 4 __removelocaleref
-FUNC 54d0 3 4 __removelocaleref
-FUNC 5648 3 4 __removelocaleref
-FUNC 5658 12 4 __removelocaleref
-FUNC 5870 10 4 __removelocaleref
-FUNC 5a7c 5 4 __removelocaleref
-FUNC 5e94 16 4 __removelocaleref
-FUNC 6578 3 4 __removelocaleref
-FUNC 6668 3 4 __removelocaleref
-FUNC 6cf0 10 4 __removelocaleref
-FUNC 6d30 1f 4 __removelocaleref
-FUNC 6d90 1b 4 __removelocaleref
+FUNC 2328 a 0 __removelocaleref
+FUNC 252c 10 0 __removelocaleref
+FUNC 2b14 14 0 __removelocaleref
+FUNC 34c8 3 0 __removelocaleref
+FUNC 3d44 10 0 __removelocaleref
+FUNC 4c00 13 0 __removelocaleref
+FUNC 4f70 14 0 __removelocaleref
+FUNC 54d0 3 0 __removelocaleref
+FUNC 5648 3 0 __removelocaleref
+FUNC 5658 12 0 __removelocaleref
+FUNC 5870 10 0 __removelocaleref
+FUNC 5a7c 5 0 __removelocaleref
+FUNC 5e94 16 0 __removelocaleref
+FUNC 6578 3 0 __removelocaleref
+FUNC 6668 3 0 __removelocaleref
+FUNC 6cf0 10 0 __removelocaleref
+FUNC 6d30 1f 0 __removelocaleref
+FUNC 6d90 1b 0 __removelocaleref
 5e94 6 74 1913
 5e9a 10 77 1913
 6d30 b 79 1913
@@ -2587,34 +2587,34 @@ FUNC 6d90 1b 4 __removelocaleref
 6cf0 10 103 1913
 5a7c 3 106 1913
 5a7f 2 107 1913
-FUNC 1dbc 14 4 __freetlocinfo
-FUNC 20ac 14 4 __freetlocinfo
-FUNC 21c0 10 4 __freetlocinfo
-FUNC 22c4 13 4 __freetlocinfo
-FUNC 2b44 c 4 __freetlocinfo
-FUNC 3c5c f 4 __freetlocinfo
-FUNC 3ec0 10 4 __freetlocinfo
-FUNC 40cc 17 4 __freetlocinfo
-FUNC 4294 e 4 __freetlocinfo
-FUNC 44c0 e 4 __freetlocinfo
-FUNC 44f8 20 4 __freetlocinfo
-FUNC 4cd4 13 4 __freetlocinfo
-FUNC 4d34 7 4 __freetlocinfo
-FUNC 4df8 10 4 __freetlocinfo
-FUNC 4f84 13 4 __freetlocinfo
-FUNC 5630 e 4 __freetlocinfo
-FUNC 577c a 4 __freetlocinfo
-FUNC 5af0 13 4 __freetlocinfo
-FUNC 5d74 12 4 __freetlocinfo
-FUNC 5dec 7 4 __freetlocinfo
-FUNC 5ed8 e 4 __freetlocinfo
-FUNC 6000 e 4 __freetlocinfo
-FUNC 61a8 14 4 __freetlocinfo
-FUNC 6634 12 4 __freetlocinfo
-FUNC 6748 13 4 __freetlocinfo
-FUNC 6984 40 4 __freetlocinfo
-FUNC 69fc e 4 __freetlocinfo
-FUNC 6c9c 18 4 __freetlocinfo
+FUNC 1dbc 14 0 __freetlocinfo
+FUNC 20ac 14 0 __freetlocinfo
+FUNC 21c0 10 0 __freetlocinfo
+FUNC 22c4 13 0 __freetlocinfo
+FUNC 2b44 c 0 __freetlocinfo
+FUNC 3c5c f 0 __freetlocinfo
+FUNC 3ec0 10 0 __freetlocinfo
+FUNC 40cc 17 0 __freetlocinfo
+FUNC 4294 e 0 __freetlocinfo
+FUNC 44c0 e 0 __freetlocinfo
+FUNC 44f8 20 0 __freetlocinfo
+FUNC 4cd4 13 0 __freetlocinfo
+FUNC 4d34 7 0 __freetlocinfo
+FUNC 4df8 10 0 __freetlocinfo
+FUNC 4f84 13 0 __freetlocinfo
+FUNC 5630 e 0 __freetlocinfo
+FUNC 577c a 0 __freetlocinfo
+FUNC 5af0 13 0 __freetlocinfo
+FUNC 5d74 12 0 __freetlocinfo
+FUNC 5dec 7 0 __freetlocinfo
+FUNC 5ed8 e 0 __freetlocinfo
+FUNC 6000 e 0 __freetlocinfo
+FUNC 61a8 14 0 __freetlocinfo
+FUNC 6634 12 0 __freetlocinfo
+FUNC 6748 13 0 __freetlocinfo
+FUNC 6984 40 0 __freetlocinfo
+FUNC 69fc e 0 __freetlocinfo
+FUNC 6c9c 18 0 __freetlocinfo
 44f8 7 129 1913
 44ff 19 137 1913
 4df8 10 137 1913
@@ -2652,15 +2652,15 @@ FUNC 6c9c 18 4 __freetlocinfo
 5d74 12 179 1913
 2b44 a 201 1913
 2b4e 2 202 1913
-FUNC 1d58 16 8 _updatetlocinfoEx_nolock
-FUNC 2338 17 8 _updatetlocinfoEx_nolock
-FUNC 2d40 2 8 _updatetlocinfoEx_nolock
-FUNC 2dc8 3 8 _updatetlocinfoEx_nolock
-FUNC 2dd4 16 8 _updatetlocinfoEx_nolock
-FUNC 4f18 17 8 _updatetlocinfoEx_nolock
-FUNC 5794 10 8 _updatetlocinfoEx_nolock
-FUNC 57b4 8 8 _updatetlocinfoEx_nolock
-FUNC 6c28 12 8 _updatetlocinfoEx_nolock
+FUNC 1d58 16 0 _updatetlocinfoEx_nolock
+FUNC 2338 17 0 _updatetlocinfoEx_nolock
+FUNC 2d40 2 0 _updatetlocinfoEx_nolock
+FUNC 2dc8 3 0 _updatetlocinfoEx_nolock
+FUNC 2dd4 16 0 _updatetlocinfoEx_nolock
+FUNC 4f18 17 0 _updatetlocinfoEx_nolock
+FUNC 5794 10 0 _updatetlocinfoEx_nolock
+FUNC 57b4 8 0 _updatetlocinfoEx_nolock
+FUNC 6c28 12 0 _updatetlocinfoEx_nolock
 4f18 6 216 1913
 2338 10 219 1913
 4f1e 11 219 1913
@@ -2691,11 +2691,11 @@ FUNC 3f0f 79 0 __updatetlocinfo
 3f6e e 292 1913
 3f7c 8 294 1913
 3f84 4 295 1913
-FUNC 1ad0 8 4 _crt_debugger_hook
+FUNC 1ad0 8 0 _crt_debugger_hook
 1ad0 0 62 1145
 1ad0 7 65 1145
 1ad7 1 66 1145
-FUNC 4fa2 7a c memset
+FUNC 4fa2 7a 0 memset
 4fa2 0 59 2789
 4fa2 4 68 2789
 4fa6 4 69 2789
@@ -2821,7 +2821,7 @@ FUNC 4695 33 0 abort
 46a6 9 81 1011
 46af 11 83 1011
 46c0 8 92 1011
-FUNC 50a3 361 c memcpy
+FUNC 50a3 361 0 memcpy
 50a3 3 101 2787
 50a6 1 113 2787
 50a7 1 114 2787
@@ -3057,19 +3057,19 @@ FUNC 50a3 361 c memcpy
 5400 1 593 2787
 5401 1 594 2787
 5402 2 595 2787
-FUNC 219c 2 4 _freea
-FUNC 4240 14 4 _freea
-FUNC 5a10 16 4 _freea
-FUNC 6904 7 4 _freea
+FUNC 219c 2 0 _freea
+FUNC 4240 14 0 _freea
+FUNC 5a10 16 0 _freea
+FUNC 6904 7 0 _freea
 5a10 5 235 281
 5a15 11 237 281
 4240 3 239 281
 4243 11 241 281
 6904 7 243 281
 219c 2 252 281
-FUNC 19e0 13 4 _msize
-FUNC 4898 14 4 _msize
-FUNC 6b2c 15 4 _msize
+FUNC 19e0 13 0 _msize
+FUNC 4898 14 0 _msize
+FUNC 6b2c 15 0 _msize
 4898 5 39 561
 489d f 43 561
 6b2c 13 43 561
@@ -3119,21 +3119,21 @@ FUNC 6dab 106 0 __report_gsfailure
 6e95 8 315 1392
 6e9d 12 319 1392
 6eaf 2 320 1392
-FUNC 1284 1c c _calloc_impl
-FUNC 1b18 14 c _calloc_impl
-FUNC 1b5c 10 c _calloc_impl
-FUNC 2d48 6 c _calloc_impl
-FUNC 3488 14 c _calloc_impl
-FUNC 3e7c 3 c _calloc_impl
-FUNC 40e4 f c _calloc_impl
-FUNC 4c60 10 c _calloc_impl
-FUNC 5650 1 c _calloc_impl
-FUNC 5898 16 c _calloc_impl
-FUNC 5f88 13 c _calloc_impl
-FUNC 5fc0 6 c _calloc_impl
-FUNC 68a8 16 c _calloc_impl
-FUNC 6b60 10 c _calloc_impl
-FUNC 6c7c 8 c _calloc_impl
+FUNC 1284 1c 0 _calloc_impl
+FUNC 1b18 14 0 _calloc_impl
+FUNC 1b5c 10 0 _calloc_impl
+FUNC 2d48 6 0 _calloc_impl
+FUNC 3488 14 0 _calloc_impl
+FUNC 3e7c 3 0 _calloc_impl
+FUNC 40e4 f 0 _calloc_impl
+FUNC 4c60 10 0 _calloc_impl
+FUNC 5650 1 0 _calloc_impl
+FUNC 5898 16 0 _calloc_impl
+FUNC 5f88 13 0 _calloc_impl
+FUNC 5fc0 6 0 _calloc_impl
+FUNC 68a8 16 0 _calloc_impl
+FUNC 6b60 10 0 _calloc_impl
+FUNC 6c7c 8 0 _calloc_impl
 5898 5 21 291
 589d 11 26 291
 40e4 d 28 291
@@ -3155,24 +3155,24 @@ FUNC 6c7c 8 c _calloc_impl
 2d48 6 53 291
 3e7c 1 53 291
 3e7d 2 69 291
-FUNC 1048 16 8 realloc
-FUNC 11a0 e 8 realloc
-FUNC 1744 2 8 realloc
-FUNC 1b34 7 8 realloc
-FUNC 261c 22 8 realloc
-FUNC 2ae0 8 8 realloc
-FUNC 3d30 12 8 realloc
-FUNC 3df8 3 8 realloc
-FUNC 4230 f 8 realloc
-FUNC 4284 10 8 realloc
-FUNC 4cb0 1 8 realloc
-FUNC 5960 1c 8 realloc
-FUNC 62a4 14 8 realloc
-FUNC 6528 1 8 realloc
-FUNC 6550 12 8 realloc
-FUNC 65dc b 8 realloc
-FUNC 6654 12 8 realloc
-FUNC 6734 14 8 realloc
+FUNC 1048 16 0 realloc
+FUNC 11a0 e 0 realloc
+FUNC 1744 2 0 realloc
+FUNC 1b34 7 0 realloc
+FUNC 261c 22 0 realloc
+FUNC 2ae0 8 0 realloc
+FUNC 3d30 12 0 realloc
+FUNC 3df8 3 0 realloc
+FUNC 4230 f 0 realloc
+FUNC 4284 10 0 realloc
+FUNC 4cb0 1 0 realloc
+FUNC 5960 1c 0 realloc
+FUNC 62a4 14 0 realloc
+FUNC 6528 1 0 realloc
+FUNC 6550 12 0 realloc
+FUNC 65dc b 0 realloc
+FUNC 6654 12 0 realloc
+FUNC 6734 14 0 realloc
 62a4 5 62 618
 62a9 f 67 618
 65dc 9 68 618
@@ -3200,52 +3200,52 @@ FUNC 6734 14 8 realloc
 5976 6 112 618
 1048 16 103 618
 2ae0 8 105 618
-FUNC 1000 7 24 __crtLCMapStringA_stat
-FUNC 11b0 14 24 __crtLCMapStringA_stat
-FUNC 17c4 8 24 __crtLCMapStringA_stat
-FUNC 1ac4 6 24 __crtLCMapStringA_stat
-FUNC 21f4 c 24 __crtLCMapStringA_stat
-FUNC 2234 9 24 __crtLCMapStringA_stat
-FUNC 2354 f 24 __crtLCMapStringA_stat
-FUNC 242c 12 24 __crtLCMapStringA_stat
-FUNC 2710 3 24 __crtLCMapStringA_stat
-FUNC 2794 b 24 __crtLCMapStringA_stat
-FUNC 28d0 13 24 __crtLCMapStringA_stat
-FUNC 31f8 5 24 __crtLCMapStringA_stat
-FUNC 327c 14 24 __crtLCMapStringA_stat
-FUNC 32c0 4a 24 __crtLCMapStringA_stat
-FUNC 336c 20 24 __crtLCMapStringA_stat
-FUNC 36f8 f 24 __crtLCMapStringA_stat
-FUNC 37e0 10 24 __crtLCMapStringA_stat
-FUNC 3c30 1 24 __crtLCMapStringA_stat
-FUNC 3f94 e 24 __crtLCMapStringA_stat
-FUNC 4300 14 24 __crtLCMapStringA_stat
-FUNC 4338 11 24 __crtLCMapStringA_stat
-FUNC 497c 16 24 __crtLCMapStringA_stat
-FUNC 4b10 15 24 __crtLCMapStringA_stat
-FUNC 4c70 14 24 __crtLCMapStringA_stat
-FUNC 4ce8 10 24 __crtLCMapStringA_stat
-FUNC 4db4 1e 24 __crtLCMapStringA_stat
-FUNC 4e68 12 24 __crtLCMapStringA_stat
-FUNC 54e8 3 24 __crtLCMapStringA_stat
-FUNC 5574 14 24 __crtLCMapStringA_stat
-FUNC 55d0 2 24 __crtLCMapStringA_stat
-FUNC 55f8 8 24 __crtLCMapStringA_stat
-FUNC 5628 8 24 __crtLCMapStringA_stat
-FUNC 578c 3 24 __crtLCMapStringA_stat
-FUNC 5838 24 24 __crtLCMapStringA_stat
-FUNC 58f4 c 24 __crtLCMapStringA_stat
-FUNC 5f44 7 24 __crtLCMapStringA_stat
-FUNC 61fc f 24 __crtLCMapStringA_stat
-FUNC 6328 14 24 __crtLCMapStringA_stat
-FUNC 63a0 c 24 __crtLCMapStringA_stat
-FUNC 6404 6 24 __crtLCMapStringA_stat
-FUNC 65e8 28 24 __crtLCMapStringA_stat
-FUNC 6624 10 24 __crtLCMapStringA_stat
-FUNC 6ad4 16 24 __crtLCMapStringA_stat
-FUNC 6d80 e 24 __crtLCMapStringA_stat
-FUNC 6eb4 3 24 __crtLCMapStringA_stat
-FUNC 6f10 f 24 __crtLCMapStringA_stat
+FUNC 1000 7 0 __crtLCMapStringA_stat
+FUNC 11b0 14 0 __crtLCMapStringA_stat
+FUNC 17c4 8 0 __crtLCMapStringA_stat
+FUNC 1ac4 6 0 __crtLCMapStringA_stat
+FUNC 21f4 c 0 __crtLCMapStringA_stat
+FUNC 2234 9 0 __crtLCMapStringA_stat
+FUNC 2354 f 0 __crtLCMapStringA_stat
+FUNC 242c 12 0 __crtLCMapStringA_stat
+FUNC 2710 3 0 __crtLCMapStringA_stat
+FUNC 2794 b 0 __crtLCMapStringA_stat
+FUNC 28d0 13 0 __crtLCMapStringA_stat
+FUNC 31f8 5 0 __crtLCMapStringA_stat
+FUNC 327c 14 0 __crtLCMapStringA_stat
+FUNC 32c0 4a 0 __crtLCMapStringA_stat
+FUNC 336c 20 0 __crtLCMapStringA_stat
+FUNC 36f8 f 0 __crtLCMapStringA_stat
+FUNC 37e0 10 0 __crtLCMapStringA_stat
+FUNC 3c30 1 0 __crtLCMapStringA_stat
+FUNC 3f94 e 0 __crtLCMapStringA_stat
+FUNC 4300 14 0 __crtLCMapStringA_stat
+FUNC 4338 11 0 __crtLCMapStringA_stat
+FUNC 497c 16 0 __crtLCMapStringA_stat
+FUNC 4b10 15 0 __crtLCMapStringA_stat
+FUNC 4c70 14 0 __crtLCMapStringA_stat
+FUNC 4ce8 10 0 __crtLCMapStringA_stat
+FUNC 4db4 1e 0 __crtLCMapStringA_stat
+FUNC 4e68 12 0 __crtLCMapStringA_stat
+FUNC 54e8 3 0 __crtLCMapStringA_stat
+FUNC 5574 14 0 __crtLCMapStringA_stat
+FUNC 55d0 2 0 __crtLCMapStringA_stat
+FUNC 55f8 8 0 __crtLCMapStringA_stat
+FUNC 5628 8 0 __crtLCMapStringA_stat
+FUNC 578c 3 0 __crtLCMapStringA_stat
+FUNC 5838 24 0 __crtLCMapStringA_stat
+FUNC 58f4 c 0 __crtLCMapStringA_stat
+FUNC 5f44 7 0 __crtLCMapStringA_stat
+FUNC 61fc f 0 __crtLCMapStringA_stat
+FUNC 6328 14 0 __crtLCMapStringA_stat
+FUNC 63a0 c 0 __crtLCMapStringA_stat
+FUNC 6404 6 0 __crtLCMapStringA_stat
+FUNC 65e8 28 0 __crtLCMapStringA_stat
+FUNC 6624 10 0 __crtLCMapStringA_stat
+FUNC 6ad4 16 0 __crtLCMapStringA_stat
+FUNC 6d80 e 0 __crtLCMapStringA_stat
+FUNC 6eb4 3 0 __crtLCMapStringA_stat
+FUNC 6f10 f 0 __crtLCMapStringA_stat
 65e8 12 96 3447
 65fa 16 101 3447
 2354 f 102 3447
@@ -3300,32 +3300,32 @@ FUNC 6f10 f 24 __crtLCMapStringA_stat
 21f4 8 242 3447
 21fc 4 244 3447
 242c 12 245 3447
-FUNC 3204 2 24 __crtLCMapStringA
-FUNC 3c24 7 24 __crtLCMapStringA
-FUNC 610c 47 24 __crtLCMapStringA
+FUNC 3204 2 0 __crtLCMapStringA
+FUNC 3c24 7 0 __crtLCMapStringA
+FUNC 610c 47 0 __crtLCMapStringA
 610c 8 258 3447
 6114 b 259 3447
 3c24 7 271 3447
 611f 34 271 3447
 3204 2 272 3447
-FUNC 1198 3 20 __crtGetStringTypeA_stat
-FUNC 17b4 e 20 __crtGetStringTypeA_stat
-FUNC 19ac 2 20 __crtGetStringTypeA_stat
-FUNC 24a4 14 20 __crtGetStringTypeA_stat
-FUNC 3318 33 20 __crtGetStringTypeA_stat
-FUNC 357c 2b 20 __crtGetStringTypeA_stat
-FUNC 43c4 b 20 __crtGetStringTypeA_stat
-FUNC 4624 14 20 __crtGetStringTypeA_stat
-FUNC 4d9c 11 20 __crtGetStringTypeA_stat
-FUNC 5094 a 20 __crtGetStringTypeA_stat
-FUNC 5b4c 12 20 __crtGetStringTypeA_stat
-FUNC 5efc c 20 __crtGetStringTypeA_stat
-FUNC 5f38 6 20 __crtGetStringTypeA_stat
-FUNC 6420 c 20 __crtGetStringTypeA_stat
-FUNC 68c0 14 20 __crtGetStringTypeA_stat
-FUNC 6910 12 20 __crtGetStringTypeA_stat
-FUNC 6bf0 28 20 __crtGetStringTypeA_stat
-FUNC 6c20 8 20 __crtGetStringTypeA_stat
+FUNC 1198 3 0 __crtGetStringTypeA_stat
+FUNC 17b4 e 0 __crtGetStringTypeA_stat
+FUNC 19ac 2 0 __crtGetStringTypeA_stat
+FUNC 24a4 14 0 __crtGetStringTypeA_stat
+FUNC 3318 33 0 __crtGetStringTypeA_stat
+FUNC 357c 2b 0 __crtGetStringTypeA_stat
+FUNC 43c4 b 0 __crtGetStringTypeA_stat
+FUNC 4624 14 0 __crtGetStringTypeA_stat
+FUNC 4d9c 11 0 __crtGetStringTypeA_stat
+FUNC 5094 a 0 __crtGetStringTypeA_stat
+FUNC 5b4c 12 0 __crtGetStringTypeA_stat
+FUNC 5efc c 0 __crtGetStringTypeA_stat
+FUNC 5f38 6 0 __crtGetStringTypeA_stat
+FUNC 6420 c 0 __crtGetStringTypeA_stat
+FUNC 68c0 14 0 __crtGetStringTypeA_stat
+FUNC 6910 12 0 __crtGetStringTypeA_stat
+FUNC 6bf0 28 0 __crtGetStringTypeA_stat
+FUNC 6c20 8 0 __crtGetStringTypeA_stat
 6bf0 12 63 3507
 6c02 7 67 3507
 6c09 f 83 3507
@@ -3349,16 +3349,16 @@ FUNC 6c20 8 20 __crtGetStringTypeA_stat
 5094 6 118 3507
 509a 4 120 3507
 6910 12 121 3507
-FUNC 25dc 40 20 __crtGetStringTypeA
-FUNC 4104 7 20 __crtGetStringTypeA
-FUNC 5ca0 2 20 __crtGetStringTypeA
+FUNC 25dc 40 0 __crtGetStringTypeA
+FUNC 4104 7 0 __crtGetStringTypeA
+FUNC 5ca0 2 0 __crtGetStringTypeA
 25dc 8 133 3507
 25e4 b 134 3507
 25ef 2d 145 3507
 4104 7 145 3507
 5ca0 2 146 3507
-FUNC 2e0c 37b 4 __free_lc_time
-FUNC 641c 3 4 __free_lc_time
+FUNC 2e0c 37b 0 __free_lc_time
+FUNC 641c 3 0 __free_lc_time
 2e0c 6 228 1800
 2e12 10 229 1800
 2e24 8 232 1800
@@ -3449,18 +3449,18 @@ FUNC 641c 3 4 __free_lc_time
 3179 e 329 1800
 641c 1 329 1800
 641d 2 332 1800
-FUNC 1308 14 4 __free_lconv_num
-FUNC 14ec 7 4 __free_lconv_num
-FUNC 24c0 7 4 __free_lconv_num
-FUNC 2d64 14 4 __free_lconv_num
-FUNC 3194 14 4 __free_lconv_num
-FUNC 33c0 7 4 __free_lconv_num
-FUNC 3c9c 7 4 __free_lconv_num
-FUNC 42ec 3 4 __free_lconv_num
-FUNC 441c 7 4 __free_lconv_num
-FUNC 448c 14 4 __free_lconv_num
-FUNC 5688 14 4 __free_lconv_num
-FUNC 5cdc 17 4 __free_lconv_num
+FUNC 1308 14 0 __free_lconv_num
+FUNC 14ec 7 0 __free_lconv_num
+FUNC 24c0 7 0 __free_lconv_num
+FUNC 2d64 14 0 __free_lconv_num
+FUNC 3194 14 0 __free_lconv_num
+FUNC 33c0 7 0 __free_lconv_num
+FUNC 3c9c 7 0 __free_lconv_num
+FUNC 42ec 3 0 __free_lconv_num
+FUNC 441c 7 0 __free_lconv_num
+FUNC 448c 14 0 __free_lconv_num
+FUNC 5688 14 0 __free_lconv_num
+FUNC 5cdc 17 0 __free_lconv_num
 5cdc 6 218 1742
 5ce2 11 219 1742
 2d64 14 222 1742
@@ -3475,34 +3475,34 @@ FUNC 5cdc 17 4 __free_lconv_num
 14ec 7 235 1742
 42ec 1 235 1742
 42ed 2 236 1742
-FUNC 1028 14 4 __free_lconv_mon
-FUNC 16f4 14 4 __free_lconv_mon
-FUNC 2040 14 4 __free_lconv_mon
-FUNC 2724 7 4 __free_lconv_mon
-FUNC 2788 7 4 __free_lconv_mon
-FUNC 2834 3 4 __free_lconv_mon
-FUNC 28f0 7 4 __free_lconv_mon
-FUNC 2b7c 7 4 __free_lconv_mon
-FUNC 3360 7 4 __free_lconv_mon
-FUNC 34d8 14 4 __free_lconv_mon
-FUNC 37cc 7 4 __free_lconv_mon
-FUNC 3bac 14 4 __free_lconv_mon
-FUNC 3ddc 14 4 __free_lconv_mon
-FUNC 4a80 7 4 __free_lconv_mon
-FUNC 4aa0 7 4 __free_lconv_mon
-FUNC 4b34 14 4 __free_lconv_mon
-FUNC 4dec 7 4 __free_lconv_mon
-FUNC 4e2c 14 4 __free_lconv_mon
-FUNC 4e5c 7 4 __free_lconv_mon
-FUNC 4efc 14 4 __free_lconv_mon
-FUNC 4f64 7 4 __free_lconv_mon
-FUNC 567c 7 4 __free_lconv_mon
-FUNC 58dc 16 4 __free_lconv_mon
-FUNC 594c 14 4 __free_lconv_mon
-FUNC 5b38 14 4 __free_lconv_mon
-FUNC 5cb4 7 4 __free_lconv_mon
-FUNC 6264 14 4 __free_lconv_mon
-FUNC 64f8 14 4 __free_lconv_mon
+FUNC 1028 14 0 __free_lconv_mon
+FUNC 16f4 14 0 __free_lconv_mon
+FUNC 2040 14 0 __free_lconv_mon
+FUNC 2724 7 0 __free_lconv_mon
+FUNC 2788 7 0 __free_lconv_mon
+FUNC 2834 3 0 __free_lconv_mon
+FUNC 28f0 7 0 __free_lconv_mon
+FUNC 2b7c 7 0 __free_lconv_mon
+FUNC 3360 7 0 __free_lconv_mon
+FUNC 34d8 14 0 __free_lconv_mon
+FUNC 37cc 7 0 __free_lconv_mon
+FUNC 3bac 14 0 __free_lconv_mon
+FUNC 3ddc 14 0 __free_lconv_mon
+FUNC 4a80 7 0 __free_lconv_mon
+FUNC 4aa0 7 0 __free_lconv_mon
+FUNC 4b34 14 0 __free_lconv_mon
+FUNC 4dec 7 0 __free_lconv_mon
+FUNC 4e2c 14 0 __free_lconv_mon
+FUNC 4e5c 7 0 __free_lconv_mon
+FUNC 4efc 14 0 __free_lconv_mon
+FUNC 4f64 7 0 __free_lconv_mon
+FUNC 567c 7 0 __free_lconv_mon
+FUNC 58dc 16 0 __free_lconv_mon
+FUNC 594c 14 0 __free_lconv_mon
+FUNC 5b38 14 0 __free_lconv_mon
+FUNC 5cb4 7 0 __free_lconv_mon
+FUNC 6264 14 0 __free_lconv_mon
+FUNC 64f8 14 0 __free_lconv_mon
 58dc 6 270 1685
 58e2 10 271 1685
 3bac 14 274 1685
@@ -3533,13 +3533,13 @@ FUNC 64f8 14 4 __free_lconv_mon
 2834 1 311 1685
 4aa0 7 311 1685
 2835 2 312 1685
-FUNC 1a0a ba c _VEC_memzero
+FUNC 1a0a ba 0 _VEC_memzero
 FUNC 637c 10 0 __sse2_available_init
 637c 0 30 4315
 637c d 31 4315
 6389 2 32 4315
 638b 1 33 4315
-FUNC 1c38 103 c _VEC_memcpy
+FUNC 1c38 103 0 _VEC_memcpy
 FUNC 6a38 2c 0 _alloca_probe_16
 6a38 0 44 4274
 6a38 1 46 4274
@@ -3603,7 +3603,7 @@ FUNC 1680 2b 0 _chkstk
 16a2 5 98 4276
 16a7 2 99 4276
 16a9 2 100 4276
-FUNC 5be0 46 8 strcspn
+FUNC 5be0 46 0 strcspn
 5be0 4 191 2794
 5be4 2 198 2794
 5be6 1 199 2794
@@ -3633,7 +3633,7 @@ FUNC 5be0 46 8 strcspn
 5c1e 2 255 2794
 5c20 3 257 2794
 5c23 3 259 2794
-FUNC 1bcb 40 8 strpbrk
+FUNC 1bcb 40 0 strpbrk
 1bcb 4 191 2794
 1bcf 2 198 2794
 1bd1 1 199 2794
@@ -3661,7 +3661,7 @@ FUNC 1bcb 40 8 strpbrk
 1c02 3 248 2794
 1c05 3 257 2794
 1c08 3 259 2794
-FUNC 3bc0 61 c __ascii_strnicmp
+FUNC 3bc0 61 0 __ascii_strnicmp
 3bc0 6 69 2798
 3bc6 3 75 2798
 3bc9 2 76 2798
@@ -3701,6 +3701,7 @@ FUNC 3bc0 61 c __ascii_strnicmp
 3c18 2 135 2798
 3c1a 2 138 2798
 3c1c 5 140 2798
+PUBLIC 2140 10 RtlUnwind
 STACK WIN 4 2cec 54 6 0 8 0 14 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
 STACK WIN 4 4b70 a 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
 STACK WIN 4 25a8 21 7 0 0 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 

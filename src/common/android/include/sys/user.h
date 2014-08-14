@@ -75,6 +75,11 @@ struct user_vfpregs {
   unsigned long       fpscr;
 };
 
+#elif defined(__aarch64__)
+
+// aarch64 does not have user_regs definitions in <asm/user.h>, instead
+// use the definitions in <asm/ptrace.h>, which we don't need to redefine here.
+
 #elif defined(__i386__)
 
 #define _I386_USER_H 1  // Prevent <asm/user.h> conflicts
@@ -122,6 +127,54 @@ struct user {
 
 #define _ASM_USER_H 1  // Prevent <asm/user.h> conflicts
 
+#define EF_REG0 6
+#define EF_REG1 7
+#define EF_REG2 8
+#define EF_REG3 9
+#define EF_REG4 10
+#define EF_REG5 11
+#define EF_REG6 12
+#define EF_REG7 13
+#define EF_REG8 14
+#define EF_REG9 15
+#define EF_REG10 16
+#define EF_REG11 17
+#define EF_REG12 18
+#define EF_REG13 19
+#define EF_REG14 20
+#define EF_REG15 21
+#define EF_REG16 22
+#define EF_REG17 23
+#define EF_REG18 24
+#define EF_REG19 25
+#define EF_REG20 26
+#define EF_REG21 27
+#define EF_REG22 28
+#define EF_REG23 29
+#define EF_REG24 30
+#define EF_REG25 31
+
+/*
+ * k0/k1 unsaved
+ */
+#define EF_REG26 32
+#define EF_REG27 33
+
+#define EF_REG28 34
+#define EF_REG29 35
+#define EF_REG30 36
+#define EF_REG31 37
+
+/*
+ * Saved special registers
+ */
+#define EF_LO 38
+#define EF_HI 39
+#define EF_CP0_EPC 40
+#define EF_CP0_BADVADDR 41
+#define EF_CP0_STATUS 42
+#define EF_CP0_CAUSE 43
+
 struct user_regs_struct {
   unsigned long long regs[32];
   unsigned long long lo;
@@ -136,6 +189,33 @@ struct user_fpregs_struct {
   unsigned long long regs[32];
   unsigned int fpcsr;
   unsigned int fir;
+};
+
+#elif defined(__x86_64__)
+
+// Bionic's user_fpregs_struct calls the tag word twd instead of ftw.  To avoid
+// changing lots of Bionic, use an ugly macro renaming trick with
+// #include_next.
+// TODO(rmcilroy): Remove when NDK headers are fixed.
+#define user_fpregs_struct __bionic_user_fpregs_struct
+#include_next <sys/user.h>
+#undef user_fpregs_struct
+
+// This struct is the same as user_fpregs_struct in Bionic's sys/user.h
+// except that the struct name and individual field names are chosen here
+// to match the ones used in breakpad for other x86_64 platforms.
+struct user_fpregs_struct {
+  __u16 cwd;
+  __u16 swd;
+  __u16 ftw;
+  __u16 fop;
+  __u64 rip;
+  __u64 rdp;
+  __u32 mxcsr;
+  __u32 mxcr_mask;
+  __u32 st_space[32];   /* 8*16 bytes for each FP-reg = 128 bytes */
+  __u32 xmm_space[64];  /* 16*16 bytes for each XMM-reg = 256 bytes */
+  __u32 padding[24];
 };
 
 #else

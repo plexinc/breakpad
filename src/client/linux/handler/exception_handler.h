@@ -146,6 +146,10 @@ class ExceptionHandler {
     crash_handler_ = callback;
   }
 
+  void set_crash_generation_client(CrashGenerationClient* client) {
+    crash_generation_client_.reset(client);
+  }
+
   // Writes a minidump immediately.  This can be used to capture the execution
   // state independently of a crash.
   // Returns true on success.
@@ -192,15 +196,15 @@ class ExceptionHandler {
     struct ucontext context;
 #if !defined(__ARM_EABI__) && !defined(__mips__)
     // #ifdef this out because FP state is not part of user ABI for Linux ARM.
-    // In case of MIPS Linux FP state is already part of struct ucontext
-    // so 'float_state' is not required.
-    struct _libc_fpstate float_state;
+    // In case of MIPS Linux FP state is already part of struct
+    // ucontext so 'float_state' is not required.
+    fpstate_t float_state;
 #endif
   };
 
   // Returns whether out-of-process dump generation is used or not.
   bool IsOutOfProcess() const {
-      return crash_generation_client_.get() != NULL;
+    return crash_generation_client_.get() != NULL;
   }
 
   // Add information about a memory mapping. This can be used if
@@ -248,7 +252,11 @@ class ExceptionHandler {
 
   MinidumpDescriptor minidump_descriptor_;
 
-  HandlerCallback crash_handler_;
+  // Must be volatile. The compiler is unaware of the code which runs in
+  // the signal handler which reads this variable. Without volatile the
+  // compiler is free to optimise away writes to this variable which it
+  // believes are never read.
+  volatile HandlerCallback crash_handler_;
 
   // The global exception handler stack. This is need becuase there may exist
   // multiple ExceptionHandler instances in a process. Each will have itself
@@ -259,7 +267,7 @@ class ExceptionHandler {
   // We need to explicitly enable ptrace of parent processes on some
   // kernels, but we need to know the PID of the cloned process before we
   // can do this. We create a pipe which we can use to block the
-  // cloned process after creating it, until we have explicitly enabled 
+  // cloned process after creating it, until we have explicitly enabled
   // ptrace. This is used to store the file descriptors for the pipe
   int fdes[2];
 

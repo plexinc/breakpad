@@ -142,7 +142,7 @@ void InstallAlternateStackLocked() {
   // SIGSTKSZ may be too small to prevent the signal handlers from overrunning
   // the alternative stack. Ensure that the size of the alternative stack is
   // large enough.
-  static const unsigned kSigStackSize = std::max(8192, SIGSTKSZ);
+  static const unsigned kSigStackSize = std::max(16384, SIGSTKSZ);
 
   // Only set an alternative stack if there isn't already one, or if the current
   // one is too small.
@@ -230,6 +230,8 @@ ExceptionHandler::~ExceptionHandler() {
       std::find(handler_stack_->begin(), handler_stack_->end(), this);
   handler_stack_->erase(handler);
   if (handler_stack_->empty()) {
+    delete handler_stack_;
+    handler_stack_ = NULL;
     RestoreAlternateStackLocked();
     RestoreHandlersLocked();
   }
@@ -398,7 +400,14 @@ bool ExceptionHandler::HandleSignal(int sig, siginfo_t* info, void* uc) {
   CrashContext context;
   memcpy(&context.siginfo, info, sizeof(siginfo_t));
   memcpy(&context.context, uc, sizeof(struct ucontext));
-#if !defined(__ARM_EABI__) && !defined(__mips__)
+#if defined(__aarch64__)
+  struct ucontext *uc_ptr = (struct ucontext*)uc;
+  struct fpsimd_context *fp_ptr =
+      (struct fpsimd_context*)&uc_ptr->uc_mcontext.__reserved;
+  if (fp_ptr->head.magic == FPSIMD_MAGIC) {
+    memcpy(&context.float_state, fp_ptr, sizeof(context.float_state));
+  }
+#elif !defined(__ARM_EABI__)  && !defined(__mips__)
   // FP state is not part of user ABI on ARM Linux.
   // In case of MIPS Linux FP state is already part of struct ucontext
   // and 'float_state' is not a member of CrashContext.
@@ -467,19 +476,25 @@ bool ExceptionHandler::GenerateDump(CrashContext *context) {
     logger::write(no_pipe_msg, sizeof(no_pipe_msg) - 1);
     logger::write(strerror(errno), strlen(strerror(errno)));
     logger::write("\n", 1);
+
+    // Ensure fdes[0] and fdes[1] are invalid file descriptors.
+    fdes[0] = fdes[1] = -1;
   }
 
   const pid_t child = sys_clone(
       ThreadEntry, stack, CLONE_FILES | CLONE_FS | CLONE_UNTRACED,
       &thread_arg, NULL, NULL, NULL);
+  if (child == -1) {
+    sys_close(fdes[0]);
+    sys_close(fdes[1]);
+    return false;
+  }
 
-  int r, status;
   // Allow the child to ptrace us
   sys_prctl(PR_SET_PTRACER, child, 0, 0, 0);
   SendContinueSignalToChild();
-  do {
-    r = sys_waitpid(child, &status, __WALL);
-  } while (r == -1 && errno == EINTR);
+  int status;
+  const int r = HANDLE_EINTR(sys_waitpid(child, &status, __WALL));
 
   sys_close(fdes[0]);
   sys_close(fdes[1]);
@@ -608,7 +623,7 @@ bool ExceptionHandler::WriteMinidump() {
   }
 #endif
 
-#if !defined(__ARM_EABI__) && !defined(__mips__)
+#if !defined(__ARM_EABI__) && !defined(__aarch64__) && !defined(__mips__)
   // FPU state is not part of ARM EABI ucontext_t.
   memcpy(&context.float_state, context.context.uc_mcontext.fpregs,
          sizeof(context.float_state));
@@ -627,6 +642,9 @@ bool ExceptionHandler::WriteMinidump() {
 #elif defined(__arm__)
   context.siginfo.si_addr =
       reinterpret_cast<void*>(context.context.uc_mcontext.arm_pc);
+#elif defined(__aarch64__)
+  context.siginfo.si_addr =
+      reinterpret_cast<void*>(context.context.uc_mcontext.pc);
 #elif defined(__mips__)
   context.siginfo.si_addr =
       reinterpret_cast<void*>(context.context.uc_mcontext.pc);

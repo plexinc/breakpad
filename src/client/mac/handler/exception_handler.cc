@@ -74,8 +74,12 @@ namespace google_breakpad {
 
 static union {
 #if USE_PROTECTED_ALLOCATIONS
+#if defined PAGE_MAX_SIZE
+  char protected_buffer[PAGE_MAX_SIZE] __attribute__((aligned(PAGE_MAX_SIZE)));
+#else
   char protected_buffer[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-#endif
+#endif  // defined PAGE_MAX_SIZE
+#endif  // USE_PROTECTED_ALLOCATIONS
   google_breakpad::ExceptionHandler *handler;
 } gProtectedData;
 
@@ -329,7 +333,7 @@ bool ExceptionHandler::WriteMinidumpForChild(mach_port_t child,
                                     EXC_I386_BPT,
 #elif defined(__ppc__) || defined(__ppc64__)
                                     EXC_PPC_BREAKPOINT,
-#elif defined(__arm__) || defined(__arm64__)
+#elif defined(__arm__) || defined(__aarch64__)
                                     EXC_ARM_BREAKPOINT,
 #else
 #error architecture not supported
@@ -525,7 +529,7 @@ void* ExceptionHandler::WaitForMessage(void* exception_handler_class) {
           exception_code = EXC_I386_BPT;
 #elif defined(__ppc__) || defined(__ppc64__)
           exception_code = EXC_PPC_BREAKPOINT;
-#elif defined(__arm__) || defined(__arm64__)
+#elif defined(__arm__) || defined(__aarch64__)
           exception_code = EXC_ARM_BREAKPOINT;
 #else
 #error architecture not supported

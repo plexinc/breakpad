@@ -1,5 +1,4 @@
 MODULE windows x86 11F7284EDE764667AA5234B0E7B07EEF1 omap_reorder_funcs.pdb
-INFO CODE_ID 517C17D7E000 omap_reorder_funcs.exe
 FILE 1 c:\src\breakpad\src\src\tools\windows\dump_syms\testdata\dump_syms_regtest.cc
 FILE 2 f:\dd\public\sdk\inc\internal\pebteb.h
 FILE 3 f:\dd\public\sdk\inc\internal\ntldr.h
@@ -282,7 +281,7 @@ FILE 4591 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\eh\hooks.cpp
 FILE 4643 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\initsect.cpp
 FILE 4664 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\rtcapi.h
 FILE 4680 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\rtcpriv.h
-FUNC 41e2 54 8 main
+FUNC 41e2 54 0 main
 41e2 6 57 1
 41e8 8 58 1
 41f0 e 59 1
@@ -299,13 +298,13 @@ FUNC 2b6a 21 0 google_breakpad::C::C()
 2b6a 21 37 1
 FUNC 30dd 14 0 google_breakpad::C::~C()
 30dd 14 38 1
-FUNC 21f6 16 8 google_breakpad::C::set_member(int)
+FUNC 21f6 16 0 google_breakpad::C::set_member(int)
 21f6 16 40 1
 FUNC 22e9 1e 0 google_breakpad::C::f()
 22e9 1e 43 1
 FUNC 2895 10 0 google_breakpad::C::g()
 2895 10 44 1
-FUNC 308e 7 4 google_breakpad::C::h(google_breakpad::C const &)
+FUNC 308e 7 0 google_breakpad::C::h(google_breakpad::C const &)
 308e 7 45 1
 FUNC 13a0 2c 0 google_breakpad::C::`scalar deleting destructor'(unsigned int)
 FUNC 205a 10 0 type_info::~type_info()
@@ -313,11 +312,11 @@ FUNC 205a 10 0 type_info::~type_info()
 205c d 50 4531
 2069 1 51 4531
 FUNC 1445 21 0 type_info::`scalar deleting destructor'(unsigned int)
-FUNC 2307 b 4 operator delete(void *)
+FUNC 2307 b 0 operator delete(void *)
 2307 5 20 2875
 230c 1 24 2875
 230d 5 23 2875
-FUNC 3238 29 4 fast_error_exit
+FUNC 3238 29 0 fast_error_exit
 3238 5 326 4250
 323d 9 335 4250
 3246 5 337 4250
@@ -364,7 +363,7 @@ FUNC 2104 a 0 mainCRTStartup
 2104 0 179 4250
 2104 5 186 4250
 2109 5 188 4250
-FUNC 5330 70 4 type_info::_Type_info_dtor(type_info *)
+FUNC 5330 70 0 type_info::_Type_info_dtor(type_info *)
 5330 c 62 4473
 533c 8 63 4473
 5344 4 64 4473
@@ -381,7 +380,7 @@ FUNC 5330 70 4 type_info::_Type_info_dtor(type_info *)
 5393 2 83 4473
 5395 2 72 4473
 5397 9 104 4473
-FUNC 2f6b 88 8 strcmp
+FUNC 2f6b 88 0 strcmp
 2f6b 0 65 2791
 2f6b 4 73 2791
 2f6f 4 74 2791
@@ -436,14 +435,14 @@ FUNC 2f6b 88 8 strcmp
 2fec 2 148 2791
 2fee 3 149 2791
 2ff1 2 150 2791
-FUNC 2b8b 3a 4 free
+FUNC 2b8b 3a 0 free
 2b8b 5 40 389
 2b90 6 45 389
 2b96 11 50 389
 2ba7 4 51 389
 2bab 18 53 389
 2bc3 2 55 389
-FUNC 23da 42 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+FUNC 23da 42 0 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
 23da 5 67 4397
 23df 32 68 4397
 2411 5 69 4397
@@ -454,7 +453,7 @@ FUNC 283a e 0 __CxxSetUnhandledExceptionFilter
 283a b 89 4397
 2845 2 90 4397
 2847 1 91 4397
-FUNC 18d9 2b 4 __crtCorExitProcess
+FUNC 18d9 2b 0 __crtCorExitProcess
 18d9 5 675 4186
 18de b 679 4186
 18e9 4 680 4186
@@ -462,7 +461,7 @@ FUNC 18d9 2b 4 __crtCorExitProcess
 18f9 4 682 4186
 18fd 5 683 4186
 1902 2 693 4186
-FUNC 5175 18 4 __crtExitProcess
+FUNC 5175 18 0 __crtExitProcess
 5175 5 698 4186
 517a 9 699 4186
 5183 a 708 4186
@@ -484,7 +483,7 @@ FUNC 1fa0 33 0 _init_pointers
 1fc2 6 816 4186
 1fc8 a 817 4186
 1fd2 1 818 4186
-FUNC 5043 24 8 _initterm_e
+FUNC 5043 24 0 _initterm_e
 5043 6 908 4186
 5049 b 917 4186
 5054 6 922 4186
@@ -492,7 +491,7 @@ FUNC 5043 24 8 _initterm_e
 505c 3 924 4186
 505f 6 917 4186
 5065 2 928 4186
-FUNC 147f 97 4 _cinit
+FUNC 147f 97 0 _cinit
 147f 5 258 4186
 1484 18 268 4186
 149c a 270 4186
@@ -506,7 +505,7 @@ FUNC 147f 97 4 _cinit
 1506 c 303 4186
 1512 2 307 4186
 1514 2 308 4186
-FUNC 4504 140 c doexit
+FUNC 4504 140 0 doexit
 4504 c 489 4186
 4510 8 507 4186
 4518 4 508 4186
@@ -541,11 +540,11 @@ FUNC 4504 140 c doexit
 462f 6 609 4186
 4635 9 610 4186
 463e 6 622 4186
-FUNC 315a 16 4 exit
+FUNC 315a 16 0 exit
 315a 5 392 4186
 315f f 393 4186
 316e 2 394 4186
-FUNC 1778 16 4 _exit
+FUNC 1778 16 0 _exit
 1778 5 400 4186
 177d f 401 4186
 178c 2 402 4186
@@ -557,12 +556,12 @@ FUNC 405e f 0 _c_exit
 405e 0 414 4186
 405e e 415 4186
 406c 1 416 4186
-FUNC 2abf 1e 4 _amsg_exit
+FUNC 2abf 1e 0 _amsg_exit
 2abf 5 439 4186
 2ac4 5 440 4186
 2ac9 9 441 4186
 2ad2 b 442 4186
-FUNC 424c 26 4 _GET_RTERRMSG
+FUNC 424c 26 0 _GET_RTERRMSG
 424c 5 165 4012
 4251 2 168 4012
 4253 c 169 4012
@@ -571,7 +570,7 @@ FUNC 424c 26 4 _GET_RTERRMSG
 4267 2 173 4012
 4269 7 170 4012
 4270 2 173 4012
-FUNC 268b 1af 4 _NMSG_WRITE
+FUNC 268b 1af 0 _NMSG_WRITE
 268b 1b 196 4012
 26a6 8 197 4012
 26ae 11 199 4012
@@ -601,7 +600,7 @@ FUNC 21bd 39 0 _FF_MSGBANNER
 21df a 140 4012
 21e9 c 141 4012
 21f5 1 143 4012
-FUNC 3ed7 14a 8 _XcptFilter
+FUNC 3ed7 14a 0 _XcptFilter
 3ed7 6 195 2369
 3edd 7 202 2369
 3ee4 8 203 2369
@@ -676,7 +675,7 @@ FUNC 255c dc 0 _setenvp
 261f 7 130 3838
 2626 5 131 3838
 262b d 133 3838
-FUNC 54b7 19a c parse_cmdline
+FUNC 54b7 19a 0 parse_cmdline
 54b7 6 221 3891
 54bd 9 229 3891
 54c6 2 232 3891
@@ -868,7 +867,7 @@ FUNC 4021 3d 0 _mtterm
 404b 7 343 3774
 4052 7 344 3774
 4059 5 352 3774
-FUNC 53a0 b4 8 _initptd
+FUNC 53a0 b4 0 _initptd
 53a0 c 379 3774
 53ac b 381 3774
 53b7 a 384 3774
@@ -990,7 +989,7 @@ FUNC 252f 1e 0 _heap_init
 254c 1 60 453
 FUNC 1c7a 45 0 _SEH_prolog4
 FUNC 1cbf 14 0 _SEH_epilog4
-FUNC 1aeb 18f 10 _except_handler4
+FUNC 1aeb 18f 0 _except_handler4
 FUNC 2ff3 9b 0 __security_init_cookie
 2ff3 8 97 1455
 2ffb 21 114 1455
@@ -1010,11 +1009,11 @@ FUNC 2ff3 9b 0 __security_init_cookie
 307b 6 172 1455
 3081 b 173 1455
 308c 2 175 1455
-FUNC 1214 f 4 _initp_misc_invarg
+FUNC 1214 f 0 _initp_misc_invarg
 1214 5 64 3583
 1219 8 65 3583
 1221 2 66 3583
-FUNC 4afb 129 c _call_reportfault
+FUNC 4afb 129 0 _call_reportfault
 4afb 16 164 3583
 4b11 9 166 3583
 4b1a 7 167 3583
@@ -1046,12 +1045,12 @@ FUNC 4afb 129 c _call_reportfault
 4c02 d 254 3583
 4c0f 7 255 3583
 4c16 e 257 3583
-FUNC 5150 25 14 _invoke_watson
+FUNC 5150 25 0 _invoke_watson
 5150 3 146 3583
 5153 12 155 3583
 5165 f 156 3583
 5174 1 157 3583
-FUNC 3261 2d 14 _invalid_parameter
+FUNC 3261 2d 0 _invalid_parameter
 3261 5 96 3583
 3266 c 103 3583
 3272 4 104 3583
@@ -1085,11 +1084,11 @@ FUNC 4d69 57 0 _mtdeletelocks
 4daf 3 220 3954
 4db2 b 214 3954
 4dbd 3 223 3954
-FUNC 2add 17 4 _unlock
+FUNC 2add 17 0 _unlock
 2add 5 370 3954
 2ae2 10 374 3954
 2af2 2 375 3954
-FUNC 12b8 c2 4 _mtinitlocknum
+FUNC 12b8 c2 0 _mtinitlocknum
 12b8 c 258 3954
 12c4 6 260 3954
 12ca a 268 3954
@@ -1116,14 +1115,14 @@ FUNC 12b8 c2 4 _mtinitlocknum
 1368 3 303 3954
 136b 6 304 3954
 1371 9 300 3954
-FUNC 31f6 33 4 _lock
+FUNC 31f6 33 0 _lock
 31f6 5 332 3954
 31fb 10 337 3954
 320b b 339 3954
 3216 8 340 3954
 321e 9 347 3954
 3227 2 348 3954
-FUNC 2a1e 5f c strcpy_s
+FUNC 2a1e 5f 0 strcpy_s
 2a1e 5 13 2523
 2a23 23 18 2523
 2a46 b 19 2523
@@ -1133,7 +1132,7 @@ FUNC 2a1e 5f c strcpy_s
 2a69 e 30 2523
 2a77 4 33 2523
 2a7b 2 34 2523
-FUNC 4eba 8b 4 strlen
+FUNC 4eba 8b 0 strlen
 4eba 0 54 2796
 4eba 4 63 2796
 4ebe 6 64 2796
@@ -1179,7 +1178,7 @@ FUNC 4eba 8b 4 strlen
 4f3e 4 119 2796
 4f42 2 120 2796
 4f44 1 121 2796
-FUNC 2312 94 4 malloc
+FUNC 2312 94 0 malloc
 2312 6 81 504
 2318 a 85 504
 2322 3d 89 504
@@ -1201,7 +1200,7 @@ FUNC 44a4 17 0 _EH4_CallFilterFunc
 FUNC 44bb 19 0 _EH4_TransferToHandler
 FUNC 44d4 19 0 _EH4_GlobalUnwind2
 FUNC 44ed 17 8 _EH4_LocalUnwind
-FUNC 2a7d 42 4 _get_errno_from_oserr
+FUNC 2a7d 42 0 _get_errno_from_oserr
 2a7d 5 119 224
 2a82 5 123 224
 2a87 9 124 224
@@ -1232,18 +1231,18 @@ FUNC 31bd 39 0 terminate()
 31e4 7 106 4591
 31eb 5 114 4591
 31f0 6 115 4591
-FUNC 43a1 11 4 _initp_eh_hooks
+FUNC 43a1 11 0 _initp_eh_hooks
 43a1 0 69 4591
 43a1 10 70 4591
 43b1 1 71 4591
-FUNC 215a 1e 4 _initp_misc_winsig
+FUNC 215a 1e 0 _initp_misc_winsig
 215a 5 57 2311
 215f 8 58 2311
 2167 5 59 2311
 216c 5 60 2311
 2171 5 61 2311
 2176 2 62 2311
-FUNC 24f8 37 4 siglookup
+FUNC 24f8 37 0 siglookup
 24f8 5 629 2311
 24fd a 630 2311
 2507 14 639 2311
@@ -1255,7 +1254,7 @@ FUNC 48e3 d 0 __get_sigabrt
 48e3 0 669 2311
 48e3 c 670 2311
 48ef 1 671 2311
-FUNC 518d 1a3 4 raise
+FUNC 518d 1a3 0 raise
 518d c 450 2311
 5199 5 457 2311
 519e 3 458 2311
@@ -1309,19 +1308,19 @@ FUNC 518d 1a3 4 raise
 5322 6 600 2311
 5328 2 603 2311
 532a 6 604 2311
-FUNC 254d f 4 _initp_misc_rand_s
+FUNC 254d f 0 _initp_misc_rand_s
 254d 5 58 2186
 2552 8 59 2186
 255a 2 60 2186
-FUNC 37b7 f 4 _initp_misc_purevirt
+FUNC 37b7 f 0 _initp_misc_purevirt
 37b7 5 179 1627
 37bc 8 180 1627
 37c4 2 181 1627
-FUNC 24e9 f 4 _initp_heap_handler
+FUNC 24e9 f 0 _initp_heap_handler
 24e9 5 31 2820
 24ee 8 32 2820
 24f6 2 33 2820
-FUNC 4644 28 4 _callnewh
+FUNC 4644 28 0 _callnewh
 4644 5 131 2820
 4649 c 133 2820
 4655 e 135 2820
@@ -1329,7 +1328,7 @@ FUNC 4644 28 4 _callnewh
 4666 2 139 2820
 4668 2 136 2820
 466a 2 139 2820
-FUNC 4c24 b6 4 _onexit_nolock
+FUNC 4c24 b6 0 _onexit_nolock
 4c24 8 100 1969
 4c2c f 103 1969
 4c3b f 104 1969
@@ -1356,7 +1355,7 @@ FUNC 11e3 31 0 __onexitinit
 120d 3 214 1969
 1210 3 216 1969
 1213 1 217 1969
-FUNC 5114 3c 4 _onexit
+FUNC 5114 3c 0 _onexit
 5114 c 81 1969
 5120 5 84 1969
 5125 4 86 1969
@@ -1365,7 +1364,7 @@ FUNC 5114 3c 4 _onexit
 5141 3 93 1969
 5144 6 94 1969
 514a 6 90 1969
-FUNC 3ec0 17 4 atexit
+FUNC 3ec0 17 0 atexit
 3ec0 5 161 1969
 3ec5 10 162 1969
 3ed5 2 163 1969
@@ -1374,7 +1373,7 @@ FUNC 28a5 23 0 _initp_misc_cfltcvt_tab
 28a9 2 56 2419
 28ab 1a 58 2419
 28c5 3 60 2419
-FUNC 30a8 35 4 _ValidateImageBase
+FUNC 30a8 35 0 _ValidateImageBase
 30a8 5 44 2079
 30ad d 50 2079
 30ba 2 52 2079
@@ -1384,7 +1383,7 @@ FUNC 30a8 35 4 _ValidateImageBase
 30c9 2 58 2079
 30cb 10 62 2079
 30db 2 68 2079
-FUNC 32a9 44 8 _FindPESection
+FUNC 32a9 44 0 _FindPESection
 32a9 5 92 2079
 32ae 8 99 2079
 32b6 18 108 2079
@@ -1392,7 +1391,7 @@ FUNC 32a9 44 8 _FindPESection
 32de 8 108 2079
 32e6 5 123 2079
 32eb 2 124 2079
-FUNC 5651 bc 4 _IsNonwritableInCurrentImage
+FUNC 5651 bc 0 _IsNonwritableInCurrentImage
 5651 35 149 2079
 5686 7 156 2079
 568d f 164 2079
@@ -1406,7 +1405,7 @@ FUNC 5651 bc 4 _IsNonwritableInCurrentImage
 56dc 16 187 2079
 56f2 9 193 2079
 56fb 12 195 2079
-FUNC 4076 16c c __crtMessageBoxW
+FUNC 4076 16c 0 __crtMessageBoxW
 4076 12 41 1053
 4088 14 49 1053
 409c 4 56 1053
@@ -1443,7 +1442,7 @@ FUNC 4076 16c c __crtMessageBoxW
 41c1 10 158 1053
 41d1 2 163 1053
 41d3 f 166 1053
-FUNC 3943 75 c wcscat_s
+FUNC 3943 75 0 wcscat_s
 3943 6 13 2468
 3949 22 18 2468
 396b 2 46 2468
@@ -1457,7 +1456,7 @@ FUNC 3943 75 c wcscat_s
 398d 14 35 2468
 39a1 9 41 2468
 39aa e 42 2468
-FUNC 241c cd 10 wcsncpy_s
+FUNC 241c cd 0 wcsncpy_s
 241c 5 13 2578
 2421 16 17 2578
 2437 5 65 2578
@@ -1479,13 +1478,13 @@ FUNC 241c cd 10 wcsncpy_s
 24c8 d 59 2578
 24d5 3 61 2578
 24d8 11 62 2578
-FUNC 328e 1b 4 wcslen
+FUNC 328e 1b 0 wcslen
 328e 5 41 2728
 3293 3 42 2728
 3296 b 44 2728
 32a1 6 46 2728
 32a7 2 47 2728
-FUNC 5454 63 c wcscpy_s
+FUNC 5454 63 0 wcscpy_s
 5454 6 13 2523
 545a 22 18 2523
 547c 2 34 2523
@@ -1493,7 +1492,7 @@ FUNC 5454 63 c wcscpy_s
 548a 16 23 2523
 54a0 9 29 2523
 54a9 e 30 2523
-FUNC 3d3b 3f 4 _set_error_mode
+FUNC 3d3b 3f 0 _set_error_mode
 3d3b 5 43 1181
 3d40 11 46 1181
 3d51 5 54 1181
@@ -1509,7 +1508,7 @@ FUNC 28c8 f 0 __security_check_cookie
 28ce 2 56 892
 28d0 2 57 892
 28d2 5 59 892
-FUNC 2178 45 4 _malloc_crt
+FUNC 2178 45 0 _malloc_crt
 2178 7 39 333
 217f 2 40 333
 2181 b 44 333
@@ -1518,7 +1517,7 @@ FUNC 2178 45 4 _malloc_crt
 21b2 5 47 333
 21b7 4 50 333
 21bb 2 51 333
-FUNC 210e 4c 8 _calloc_crt
+FUNC 210e 4c 0 _calloc_crt
 210e 7 54 333
 2115 2 55 333
 2117 12 61 333
@@ -1527,7 +1526,7 @@ FUNC 210e 4c 8 _calloc_crt
 214f 5 64 333
 2154 4 67 333
 2158 2 68 333
-FUNC 4e39 4e 8 _realloc_crt
+FUNC 4e39 4e 0 _realloc_crt
 4e39 7 71 333
 4e40 2 72 333
 4e42 f 76 333
@@ -1610,7 +1609,7 @@ FUNC 3d83 a4 0 __updatetmbcinfo
 3e06 7 524 3326
 3e0d 11 527 3326
 3e1e 9 529 3326
-FUNC 48f9 87 4 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
+FUNC 48f9 87 0 _LocaleUpdate::_LocaleUpdate(localeinfo_struct *)
 48f9 5 240 111
 48fe e 241 111
 490c 8 243 111
@@ -1638,7 +1637,7 @@ FUNC 10e5 7c 0 getSystemCP
 113e 12 305 3326
 1150 f 308 3326
 115f 2 309 3326
-FUNC 3b52 1e9 8 _setmbcp_nolock
+FUNC 3b52 1e9 0 _setmbcp_nolock
 3b52 17 684 3326
 3b69 b 691 3326
 3b74 9 694 3326
@@ -1681,7 +1680,7 @@ FUNC 3b52 1e9 8 _setmbcp_nolock
 3d23 6 795 3326
 3d29 3 744 3326
 3d2c f 800 3326
-FUNC 39b8 19a 4 _setmbcp
+FUNC 39b8 19a 0 _setmbcp
 39b8 c 572 3326
 39c4 4 573 3326
 39c8 a 577 3326
@@ -1735,17 +1734,17 @@ FUNC 1cd3 1e 0 __initmbctable
 1ce4 a 853 3326
 1cee 2 858 3326
 1cf0 1 859 3326
-FUNC 2638 53 10 x_ismbbtype_l
+FUNC 2638 53 0 x_ismbbtype_l
 2638 8 213 3271
 2640 b 214 3271
 264b 4 219 3271
 264f 3a 222 3271
 2689 2 223 3271
-FUNC 1516 18 4 _ismbblead
+FUNC 1516 18 0 _ismbblead
 1516 5 171 3271
 151b 11 172 3271
 152c 2 173 3271
-FUNC 4cda 8f 4 __addlocaleref
+FUNC 4cda 8f 0 __addlocaleref
 4cda 7 36 1913
 4ce1 d 39 1913
 4cee a 41 1913
@@ -1764,7 +1763,7 @@ FUNC 4cda 8f 4 __addlocaleref
 4d4e 8 53 1913
 4d56 11 63 1913
 4d67 2 64 1913
-FUNC 3e27 99 4 __removelocaleref
+FUNC 3e27 99 0 __removelocaleref
 3e27 6 74 1913
 3e2d b 77 1913
 3e38 b 79 1913
@@ -1785,7 +1784,7 @@ FUNC 3e27 99 4 __removelocaleref
 3eab 10 103 1913
 3ebb 3 106 1913
 3ebe 2 107 1913
-FUNC 178e 14b 4 __freetlocinfo
+FUNC 178e 14b 0 __freetlocinfo
 178e 7 129 1913
 1795 25 137 1913
 17ba e 140 1913
@@ -1812,7 +1811,7 @@ FUNC 178e 14b 4 __freetlocinfo
 18c5 8 179 1913
 18cd a 201 1913
 18d7 2 202 1913
-FUNC 3170 4d 8 _updatetlocinfoEx_nolock
+FUNC 3170 4d 0 _updatetlocinfoEx_nolock
 3170 6 216 1913
 3176 e 219 1913
 3184 3 222 1913
@@ -1840,11 +1839,11 @@ FUNC 4dc0 79 0 __updatetlocinfo
 4e1f e 292 1913
 4e2d 8 294 1913
 4e35 4 295 1913
-FUNC 344e 8 4 _crt_debugger_hook
+FUNC 344e 8 0 _crt_debugger_hook
 344e 0 62 1145
 344e 7 65 1145
 3455 1 66 1145
-FUNC 208a 7a c memset
+FUNC 208a 7a 0 memset
 208a 0 59 2789
 208a 4 68 2789
 208e 4 69 2789
@@ -1970,7 +1969,7 @@ FUNC 2862 33 0 abort
 2873 9 81 1011
 287c 11 83 1011
 288d 8 92 1011
-FUNC 3456 361 c memcpy
+FUNC 3456 361 0 memcpy
 3456 3 101 2787
 3459 1 113 2787
 345a 1 114 2787
@@ -2206,14 +2205,14 @@ FUNC 3456 361 c memcpy
 37b3 1 593 2787
 37b4 1 594 2787
 37b5 2 595 2787
-FUNC 206a 20 4 _freea
+FUNC 206a 20 0 _freea
 206a 5 235 281
 206f 7 237 281
 2076 3 239 281
 2079 8 241 281
 2081 7 243 281
 2088 2 252 281
-FUNC 4e87 33 4 _msize
+FUNC 4e87 33 0 _msize
 4e87 5 39 561
 4e8c 19 43 561
 4ea5 2 50 561
@@ -2260,7 +2259,7 @@ FUNC 1672 106 0 __report_gsfailure
 175c 8 315 1392
 1764 12 319 1392
 1776 2 320 1392
-FUNC 1161 82 c _calloc_impl
+FUNC 1161 82 0 _calloc_impl
 1161 5 21 291
 1166 7 26 291
 116d 19 28 291
@@ -2279,7 +2278,7 @@ FUNC 1161 82 c _calloc_impl
 11d3 7 52 291
 11da 7 53 291
 11e1 2 69 291
-FUNC 5067 ad 8 realloc
+FUNC 5067 ad 0 realloc
 5067 5 62 618
 506c 6 67 618
 5072 9 68 618
@@ -2302,7 +2301,7 @@ FUNC 5067 ad 8 realloc
 50f8 2 112 618
 50fa 16 103 618
 5110 4 105 618
-FUNC 1904 1e7 24 __crtLCMapStringA_stat
+FUNC 1904 1e7 0 __crtLCMapStringA_stat
 1904 12 96 3447
 1916 c 101 3447
 1922 17 102 3447
@@ -2334,12 +2333,12 @@ FUNC 1904 1e7 24 __crtLCMapStringA_stat
 1acd 8 242 3447
 1ad5 4 244 3447
 1ad9 12 245 3447
-FUNC 22a3 46 24 __crtLCMapStringA
+FUNC 22a3 46 0 __crtLCMapStringA
 22a3 8 258 3447
 22ab b 259 3447
 22b6 31 271 3447
 22e7 2 272 3447
-FUNC 47fc e7 20 __crtGetStringTypeA_stat
+FUNC 47fc e7 0 __crtGetStringTypeA_stat
 47fc 12 63 3507
 480e 7 67 3507
 4815 5 83 3507
@@ -2355,12 +2354,12 @@ FUNC 47fc e7 20 __crtGetStringTypeA_stat
 48c7 6 118 3507
 48cd 4 120 3507
 48d1 12 121 3507
-FUNC 152e 40 20 __crtGetStringTypeA
+FUNC 152e 40 0 __crtGetStringTypeA
 152e 8 133 3507
 1536 b 134 3507
 1541 2b 145 3507
 156c 2 146 3507
-FUNC 2bf4 377 4 __free_lc_time
+FUNC 2bf4 377 0 __free_lc_time
 2bf4 6 228 1800
 2bfa b 229 1800
 2c05 8 232 1800
@@ -2450,7 +2449,7 @@ FUNC 2bf4 377 4 __free_lc_time
 2f4f b 328 1800
 2f5a f 329 1800
 2f69 2 332 1800
-FUNC 30f1 69 4 __free_lconv_num
+FUNC 30f1 69 0 __free_lconv_num
 30f1 6 218 1742
 30f7 7 219 1742
 30fe a 222 1742
@@ -2464,7 +2463,7 @@ FUNC 30f1 69 4 __free_lconv_num
 3145 b 234 1742
 3150 8 235 1742
 3158 2 236 1742
-FUNC 4f45 fe 4 __free_lconv_mon
+FUNC 4f45 fe 0 __free_lconv_mon
 4f45 6 270 1685
 4f4b b 271 1685
 4f56 b 274 1685
@@ -2494,13 +2493,13 @@ FUNC 4f45 fe 4 __free_lconv_mon
 502e b 310 1685
 5039 8 311 1685
 5041 2 312 1685
-FUNC 1000 ba c _VEC_memzero
+FUNC 1000 ba 0 _VEC_memzero
 FUNC 2a0e 10 0 __sse2_available_init
 2a0e 0 30 4315
 2a0e d 31 4315
 2a1b 2 32 4315
 2a1d 1 33 4315
-FUNC 3840 103 c _VEC_memcpy
+FUNC 3840 103 0 _VEC_memcpy
 FUNC 2b3e 2c 0 _alloca_probe_16
 2b3e 0 44 4274
 2b3e 1 46 4274
@@ -2564,7 +2563,7 @@ FUNC 10ba 2b 0 _chkstk
 10dc 5 98 4276
 10e1 2 99 4276
 10e3 2 100 4276
-FUNC 37c6 46 8 strcspn
+FUNC 37c6 46 0 strcspn
 37c6 4 191 2794
 37ca 2 198 2794
 37cc 1 199 2794
@@ -2594,7 +2593,7 @@ FUNC 37c6 46 8 strcspn
 3804 2 255 2794
 3806 3 257 2794
 3809 3 259 2794
-FUNC 1577 40 8 strpbrk
+FUNC 1577 40 0 strpbrk
 1577 4 191 2794
 157b 2 198 2794
 157d 1 199 2794
@@ -2622,7 +2621,7 @@ FUNC 1577 40 8 strpbrk
 15ae 3 248 2794
 15b1 3 257 2794
 15b4 3 259 2794
-FUNC 1fd3 61 c __ascii_strnicmp
+FUNC 1fd3 61 0 __ascii_strnicmp
 1fd3 6 69 2798
 1fd9 3 75 2798
 1fdc 2 76 2798
@@ -2662,6 +2661,7 @@ FUNC 1fd3 61 c __ascii_strnicmp
 202b 2 135 2798
 202d 2 138 2798
 202f 5 140 2798
+PUBLIC 1cf1 10 RtlUnwind
 STACK WIN 4 41e2 54 6 0 8 0 14 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
 STACK WIN 4 4242 a 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
 STACK WIN 4 2b6a 21 7 0 0 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 

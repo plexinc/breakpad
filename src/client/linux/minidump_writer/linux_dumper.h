@@ -56,7 +56,7 @@ typedef typeof(((struct user*) 0)->u_debugreg[0]) debugreg_t;
 // Typedef for our parsing of the auxv variables in /proc/pid/auxv.
 #if defined(__i386) || defined(__ARM_EABI__) || defined(__mips__)
 typedef Elf32_auxv_t elf_aux_entry;
-#elif defined(__x86_64)
+#elif defined(__x86_64) || defined(__aarch64__)
 typedef Elf64_auxv_t elf_aux_entry;
 #endif
 
@@ -88,6 +88,10 @@ struct ThreadInfo {
   // Mimicking how strace does this(see syscall.c, search for GETREGS)
   struct user_regs regs;
   struct user_fpregs fpregs;
+#elif defined(__aarch64__)
+  // Use the structures defined in <asm/ptrace.h>
+  struct user_pt_regs regs;
+  struct user_fpsimd_state fpregs;
 #elif defined(__mips__)
   user_regs_struct regs;
   user_fpregs_struct fpregs;
@@ -103,6 +107,7 @@ struct MappingInfo {
   uintptr_t start_addr;
   size_t size;
   size_t offset;  // offset into the backed file.
+  bool exec;  // true if the mapping has the execute bit set.
   char name[NAME_MAX];
 };
 
@@ -157,6 +162,13 @@ class LinuxDumper {
                                    bool member,
                                    unsigned int mapping_id,
                                    uint8_t identifier[sizeof(MDGUID)]);
+
+  // Find the shared object name (SONAME) by examining the ELF information
+  // for |mapping|. If the SONAME is found copy it into the passed buffer
+  // |soname| and return true. The size of the buffer is |soname_size|.
+  // The SONAME will be truncated if it is too long to fit in the buffer.
+  static bool ElfFileSoName(
+      const MappingInfo& mapping, char* soname, size_t soname_size);
 
   uintptr_t crash_address() const { return crash_address_; }
   void set_crash_address(uintptr_t crash_address) {
