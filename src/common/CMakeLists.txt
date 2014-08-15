@@ -35,6 +35,7 @@ if(APPLE)
 
 else(APPLE)
   list(APPEND common_SRC
+    linux/crc32.cc
     linux/dump_symbols.cc 
     linux/elf_symbols_to_module.cc 
     linux/elfutils.cc 
