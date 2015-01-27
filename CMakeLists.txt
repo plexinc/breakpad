@@ -56,3 +56,4 @@ set(PTHREAD_CFLAGS "")
 
 configure_file(breakpad-client.pc.in breakpad-client.pc)
 configure_file(breakpad.pc.in breakpad.pc)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/breakpad-client.pc ${CMAKE_CURRENT_BINARY_DIR}/breakpad.pc DESTINATION lib/pkgconfig)
