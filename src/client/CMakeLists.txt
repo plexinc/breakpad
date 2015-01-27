@@ -9,12 +9,8 @@ if(APPLE)
     mac/handler/dynamic_images.cc
     mac/handler/exception_handler.cc
     mac/handler/minidump_generator.cc
-    mac/handler/protected_memory_allocator.cc
     mac/crash_generation/crash_generation_client.cc
     mac/crash_generation/crash_generation_server.cc
-    mac/crash_generation/ConfigFile.mm
-    mac/crash_generation/InspectorMain.mm
-    mac/crash_generation/Inspector.mm
   )
   file(GLOB HEADERS mac/handler/*h)
   install(FILES ${HEADERS} DESTINATION include/breakpad/client/mac/handler)
