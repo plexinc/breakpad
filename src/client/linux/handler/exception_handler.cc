@@ -233,6 +233,11 @@ ExceptionHandler::ExceptionHandler(const MinidumpDescriptor& descriptor,
       !minidump_descriptor_.IsMicrodumpOnConsole())
     minidump_descriptor_.UpdatePath();
 
+#if defined(__ANDROID__)
+  if (minidump_descriptor_.IsMicrodumpOnConsole())
+    logger::initializeCrashLogWriter();
+#endif
+
   pthread_mutex_lock(&g_handler_stack_mutex_);
   if (!g_handler_stack_)
     g_handler_stack_ = new std::vector<ExceptionHandler*>;
@@ -570,10 +575,13 @@ void ExceptionHandler::WaitForContinueSignal() {
 bool ExceptionHandler::DoDump(pid_t crashing_process, const void* context,
                               size_t context_size) {
   if (minidump_descriptor_.IsMicrodumpOnConsole()) {
-    return google_breakpad::WriteMicrodump(crashing_process,
-                                           context,
-                                           context_size,
-                                           mapping_list_);
+    return google_breakpad::WriteMicrodump(
+        crashing_process,
+        context,
+        context_size,
+        mapping_list_,
+        minidump_descriptor_.microdump_build_fingerprint(),
+        minidump_descriptor_.microdump_product_info());
   }
   if (minidump_descriptor_.IsFD()) {
     return google_breakpad::WriteMinidump(minidump_descriptor_.fd(),
