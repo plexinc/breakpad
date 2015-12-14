@@ -60,7 +60,7 @@ elseif(WIN32)
     windows/string_utils.cc
     windows/http_upload.cc
   )
-  file(GLOB WIN_HEADERS linux/*.h)
+  file(GLOB WIN_HEADERS windows/*.h)
   install(FILES ${WIN_HEADERS} DESTINATION include/breakpad/common/windows)
 endif(APPLE)
 
