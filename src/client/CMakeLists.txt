@@ -20,7 +20,28 @@ if(APPLE)
 
   file(GLOB HEADERS mac/crash_generation/*h)
   install(FILES ${HEADERS} DESTINATION include/breakpad/client/mac/crash_generation)
-else(APPLE)
+elseif(WIN32)
+  add_library(breakpad_client STATIC
+    $<TARGET_OBJECTS:common>
+    windows/crash_generation/client_info.cc
+    windows/crash_generation/crash_generation_client.cc
+    windows/crash_generation/crash_generation_server.cc
+    windows/crash_generation/minidump_generator.cc
+    windows/handler/exception_handler.cc
+  )
+  
+  file(GLOB HEADERS windows/handler/*h)
+  install(FILES ${HEADERS} DESTINATION include/breakpad/client/windows/handler)
+
+  file(GLOB HEADERS windows/crash_generation/*h)
+  install(FILES ${HEADERS} DESTINATION include/breakpad/client/windows/crash_generation)
+
+  file(GLOB HEADERS windows/common/*h)
+  install(FILES ${HEADERS} DESTINATION include/breakpad/client/windows/common)
+  
+  file(GLOB HEADERS windows/sender/*h)
+  install(FILES ${HEADERS} DESTINATION include/breakpad/client/windows/sender)
+elseif(UNIX)
   add_library(breakpad_client STATIC
     linux/crash_generation/crash_generation_client.cc 
     linux/crash_generation/crash_generation_server.cc 

@@ -1,15 +1,20 @@
-set(common_SRC
-  dwarf_cfi_to_module.cc 
-  dwarf_cu_to_module.cc 
-  dwarf_line_to_module.cc 
-  language.cc 
-  module.cc 
-  stabs_reader.cc 
-  stabs_to_module.cc 
-  dwarf/bytereader.cc 
-  dwarf/dwarf2diehandler.cc 
-  dwarf/dwarf2reader.cc 
-)
+if(UNIX)
+  set(common_SRC
+    dwarf_cfi_to_module.cc 
+    dwarf_cu_to_module.cc 
+    dwarf_line_to_module.cc 
+    language.cc 
+    module.cc 
+    stabs_reader.cc 
+    stabs_to_module.cc 
+    dwarf/bytereader.cc 
+    dwarf/dwarf2diehandler.cc 
+    dwarf/dwarf2reader.cc 
+  )
+  
+  file(GLOB DWARF_HEADERS dwarf/*.h)
+  install(FILES ${DWARF_HEADERS} DESTINATION include/breakpad/common/dwarf)
+endif(UNIX)
 
 if(APPLE)
   list(APPEND common_SRC
@@ -33,7 +38,7 @@ if(APPLE)
   file(GLOB MAC_HEADERS mac/*.h)
   install(FILES ${MAC_HEADERS} DESTINATION include/breakpad/common/mac)
 
-else(APPLE)
+elseif(UNIX)
   list(APPEND common_SRC
     linux/crc32.cc
     linux/dump_symbols.cc 
@@ -46,11 +51,18 @@ else(APPLE)
   )
   file(GLOB LINUX_HEADERS linux/*.h)
   install(FILES ${LINUX_HEADERS} DESTINATION include/breakpad/common/linux)
-
+elseif(WIN32)
+  list(APPEND common_SRC
+    windows/dia_util.cc
+    windows/guid_string.cc
+    windows/omap.cc
+    windows/pdb_source_line_writer.cc
+    windows/string_utils.cc
+    windows/http_upload.cc
+  )
+  file(GLOB WIN_HEADERS linux/*.h)
+  install(FILES ${WIN_HEADERS} DESTINATION include/breakpad/common/windows)
 endif(APPLE)
-
-file(GLOB DWARF_HEADERS dwarf/*.h)
-install(FILES ${DWARF_HEADERS} DESTINATION include/breakpad/common/dwarf)
 
 add_library(common OBJECT ${common_SRC})
 

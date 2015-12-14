@@ -1,33 +1,41 @@
 Project(breakpad)
 cmake_minimum_required(VERSION 2.8)
 
-# find some include files
-include(CheckIncludeFiles)
-check_include_files(a.out.h HAVE_A_OUT_H)
-check_include_files(inttypes.h HAVE_INTTYPES_H)
-check_include_files(memory.h HAVE_MEMORY_H)
-check_include_files(stdint.h HAVE_STDINT_H)
-check_include_files(stdlib.h HAVE_STDLIB_H)
-check_include_files(strings.h HAVE_STRINGS_H)
-check_include_files(string.h HAVE_STRING_H)
-check_include_files(sys/stat.h HAVE_SYS_STAT_H)
-check_include_files(sys/types.h HAVE_SYS_TYPES_H)
-check_include_files(unistd.h HAVE_UNISTD_H)
-check_include_files(cpuid.h HAVE_CPUID_H)
+# find some include files¨
+if(UNIX)
+	include(CheckIncludeFiles)
+	check_include_files(a.out.h HAVE_A_OUT_H)
+	check_include_files(inttypes.h HAVE_INTTYPES_H)
+	check_include_files(memory.h HAVE_MEMORY_H)
+	check_include_files(stdint.h HAVE_STDINT_H)
+	check_include_files(stdlib.h HAVE_STDLIB_H)
+	check_include_files(strings.h HAVE_STRINGS_H)
+	check_include_files(string.h HAVE_STRING_H)
+	check_include_files(sys/stat.h HAVE_SYS_STAT_H)
+	check_include_files(sys/types.h HAVE_SYS_TYPES_H)
+	check_include_files(unistd.h HAVE_UNISTD_H)
+	check_include_files(cpuid.h HAVE_CPUID_H)
 
-# check for threads
-find_package(Threads)
+	# check for threads
+	find_package(Threads)
+	
+	configure_file(src/config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+	
+	include(CheckSymbolExists)
+	check_symbol_exists(ULLONG_MAX "limits.h" HAVE_ULLONG_MAX)
+	if(NOT HAVE_ULLONG_MAX)
+	add_definitions(-DULLONG_MAX=18446744073709551615ULL)
+	endif(NOT HAVE_ULLONG_MAX)
+	
+	add_definitions(-DHAVE_CONFIG_H)
+endif(UNIX)
 
-configure_file(src/config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-
-include(CheckSymbolExists)
-check_symbol_exists(ULLONG_MAX "limits.h" HAVE_ULLONG_MAX)
-if(NOT HAVE_ULLONG_MAX)
-  add_definitions(-DULLONG_MAX=18446744073709551615ULL)
-endif(NOT HAVE_ULLONG_MAX)
-
-add_definitions(-DHAVE_CONFIG_H)
 include_directories(src ${CMAKE_CURRENT_BINARY_DIR})
+
+if(WIN32)
+	add_definitions(/DUNICODE /D_UNICODE /D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS)
+	include_directories("$ENV{VSInstallDir}/DIA SDK/include")
+endif(WIN32)
 
 if(APPLE)
 	add_definitions(-DHAVE_MACH_O_NLIST_H)
@@ -43,6 +51,8 @@ if(APPLE)
 	add_subdirectory(src/tools/mac)
 elseif(UNIX)
 	add_subdirectory(src/tools/linux)
+elseif(WIN32)
+	add_subdirectory(src/tools/windows)
 endif(APPLE)
 
 set(PACKAGE_NAME breakpad)
