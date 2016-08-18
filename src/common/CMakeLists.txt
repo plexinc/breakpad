@@ -9,7 +9,7 @@ set(common_SRC
   dwarf/bytereader.cc 
   dwarf/dwarf2diehandler.cc 
   dwarf/dwarf2reader.cc 
-  dwarf/elf_reader.cc
+#  dwarf/elf_reader.cc
 )
 
 if(APPLE)
