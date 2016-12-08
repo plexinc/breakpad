@@ -51,6 +51,9 @@ elseif(UNIX)
     linux/minidump_writer/linux_dumper.cc 
     linux/minidump_writer/linux_ptrace_dumper.cc 
     linux/minidump_writer/minidump_writer.cc 
+    linux/dump_writer_common/thread_info.cc
+    linux/dump_writer_common/ucontext_reader.cc
+    linux/microdump_writer/microdump_writer.cc
     ${COMMON_SRC}
 
     ${PROJECT_SOURCE_DIR}/src/common/convert_UTF.c 
@@ -74,6 +77,14 @@ elseif(UNIX)
   file(GLOB HEADERS linux/minidump_writer/*h)
   install(FILES ${HEADERS}
           DESTINATION include/breakpad/client/linux/minidump_writer)
+
+  file(GLOB HEADERS linux/dump_writer_common/*h)
+  install(FILES ${HEADERS}
+          DESTINATION include/breakpad/client/linux/dump_writer_common)
+
+  file(GLOB HEADERS linux/microdump_writer/*h)
+  install(FILES ${HEADERS}
+          DESTINATION include/breakpad/client/linux/microdump_writer)
 
 endif(APPLE)
 
