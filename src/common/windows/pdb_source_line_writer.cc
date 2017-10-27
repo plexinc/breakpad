@@ -631,7 +631,6 @@ bool PDBSourceLineWriter::PrintFrameDataUsingPDB() {
         }
       }
 
-      wstring wprogram_string(program_string);
       for (size_t i = 0; i < frame_infos.size(); ++i) {
         const FrameInfo& fi(frame_infos[i]);
         fprintf(output_, "STACK WIN %x %x %x %x %x %x %x %x %x %d ",
@@ -639,7 +638,7 @@ bool PDBSourceLineWriter::PrintFrameDataUsingPDB() {
                 0 /* epilog_size */, parameter_size, saved_register_size,
                 local_size, max_stack_size, program_string_result == S_OK);
         if (program_string_result == S_OK) {
-          fprintf(output_, "%ws\n", wprogram_string.c_str());
+          fprintf(output_, "%ws\n", program_string.m_str);
         } else {
           fprintf(output_, "%d\n", allocates_base_pointer);
         }
