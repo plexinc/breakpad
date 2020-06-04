@@ -111,7 +111,7 @@ Usage(int argc, const char *argv[]) {
 //=============================================================================
 static void
 SetupOptions(int argc, const char *argv[], Options *options) {
-  extern int optind;
+  extern int optind, optopt;
   int ch;
   constexpr char flag_pattern[] = "u:v:x:p:k:t:c:i:hf?";
 
@@ -120,7 +120,11 @@ SetupOptions(int argc, const char *argv[], Options *options) {
       case 'h':
       case '?':
         Usage(argc, argv);
-        exit(0);
+        // ch might be '?' because getopt found an error while parsing args (as
+        // opposed to finding "-?" as an arg), in which case optopt is set to
+        // the bad arg value, so return an error code if optopt is set,
+        // otherwise exit cleanly.
+        exit(optopt == 0 ? 0 : 1);
         break;
       case 'u':
         options->proxy_user_pwd = optarg;
