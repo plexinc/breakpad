@@ -34,36 +34,37 @@ if(ANDROID)
   )
 endif()
 
+if(UNIX)
+  target_sources(breakpad_common
+    PRIVATE
+    dwarf/bytereader.cc
+    dwarf/cfi_assembler.cc
+    dwarf/dwarf2diehandler.cc
+    dwarf/dwarf2reader.cc
+    dwarf/elf_reader.cc
+    dwarf/functioninfo.cc
+    stabs_reader.cc
+    stabs_to_module.cc
+  )
+endif()
+
 if(APPLE)
   target_sources(breakpad_common
     PRIVATE
     mac/arch_utilities.cc
     mac/bootstrap_compat.cc
-    mac/byteswap.h
-    mac/dump_syms.h
     mac/dump_syms.cc
     mac/file_id.cc
-    mac/file_id.h
-    mac/GTMDefines.h
-    mac/GTMLogger.h
     mac/GTMLogger.m
-    mac/HTTPMultipartUpload.h
     mac/HTTPMultipartUpload.m
-    mac/MachIPC.h
     mac/MachIPC.mm
     mac/macho_id.cc
-    mac/macho_id.h
     mac/macho_reader.cc
-    mac/macho_reader.h
     mac/macho_utilities.cc
-    mac/macho_utilities.h
     mac/macho_walker.cc
-    mac/macho_walker.h
-    mac/scoped_task_suspend-inl.h
     mac/string_utilities.cc
-    mac/string_utilities.h
-    mac/super_fat_arch.h
   )
+  target_include_directories(breakpad_common PUBLIC mac)
 endif()
 
 if(MSVC)

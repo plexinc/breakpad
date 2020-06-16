@@ -6,9 +6,29 @@ target_link_libraries(breakpad_client
   breakpad_interface
 )
 
-#target_sources(breakpad_client PRIVATE
-#  minidump_file_writer.cc
-#)
+if(UNIX)
+  target_sources(breakpad_client PRIVATE
+    minidump_file_writer.cc
+  )
+endif()
+
+if(APPLE)
+  target_sources(breakpad_client
+    PRIVATE
+    mac/crash_generation/ConfigFile.mm
+    mac/crash_generation/crash_generation_client.cc
+    mac/crash_generation/crash_generation_server.cc
+    mac/crash_generation/Inspector.mm
+    mac/crash_generation/InspectorMain.mm
+    mac/handler/breakpad_nlist_64.cc
+    mac/handler/dynamic_images.cc
+    mac/handler/exception_handler.cc
+    mac/handler/minidump_generator.cc
+    mac/handler/protected_memory_allocator.cc
+  )
+
+  target_include_directories(breakpad_client PRIVATE apple/Framework)
+endif()
 
 if(UNIX AND NOT APPLE)
   target_sources(breakpad_client

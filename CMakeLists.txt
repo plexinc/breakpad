@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(breakpad C CXX ASM)
 
+if(APPLE)
+  enable_language(OBJC OBJCXX)
+endif()
+
 find_package(Threads REQUIRED)
 
 add_library(breakpad_interface INTERFACE)
@@ -8,6 +12,8 @@ target_include_directories(breakpad_interface INTERFACE src)
 if(UNIX AND NOT APPLE)
   target_include_directories(breakpad_interface INTERFACE plex)
 endif()
+
+set(CMAKE_CXX_STANDARD 11)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT WIN32)
   target_compile_options(breakpad_interface
@@ -22,11 +28,22 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT WIN32)
     -frtti
   )
 
-  target_link_options(breakpad_interface
-    INTERFACE
-    -Wl,-gc-sections
-    -Wl,-z,noexecstack
-  )
+  if(UNIX AND NOT APPLE)
+    target_link_options(breakpad_interface
+      INTERFACE
+      -Wl,-gc-sections
+      -Wl,-z,noexecstack
+    )
+  elseif(APPLE)
+    target_link_options(breakpad_interface
+      INTERFACE
+      -Wl,-dead_strip
+    )
+    target_compile_definitions(breakpad_interface
+      INTERFACE
+      HAVE_MACH_O_NLIST_H
+    )
+  endif()
 
   target_compile_definitions(breakpad_interface
     INTERFACE
