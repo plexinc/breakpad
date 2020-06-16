@@ -69,13 +69,13 @@ void CULineInfoHandler::DefineDir(const string& name, uint32_t dir_num) {
 }
 
 void CULineInfoHandler::DefineFile(const string& name,
-                                   int32 file_num, uint32_t dir_num,
+                                   int32_t file_num, uint32_t dir_num,
                                    uint64_t mod_time, uint64_t length) {
   assert(dir_num >= 0);
   assert(dir_num < dirs_->size());
 
   // These should never come out of order, actually.
-  if (file_num == (int32)files_->size() || file_num == -1) {
+  if (file_num == (int32_t)files_->size() || file_num == -1) {
     string dir = dirs_->at(dir_num);
 
     SourceFileInfo s;

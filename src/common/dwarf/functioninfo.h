@@ -69,8 +69,8 @@ struct SourceFileInfo {
   uint64_t lowpc;
 };
 
-typedef std::map<uint64, FunctionInfo*> FunctionMap;
-typedef std::map<uint64, std::pair<string, uint32> > LineMap;
+typedef std::map<uint64_t, FunctionInfo*> FunctionMap;
+typedef std::map<uint64_t, std::pair<string, uint32_t> > LineMap;
 
 // This class is a basic line info handler that fills in the dirs,
 // file, and linemap passed into it with the data produced from the
@@ -90,7 +90,7 @@ class CULineInfoHandler: public LineInfoHandler {
 
   // Called when we define a filename.  We just place
   // concat(dirs_[DIR_NUM], NAME) into files_ at position FILE_NUM.
-  virtual void DefineFile(const string& name, int32 file_num,
+  virtual void DefineFile(const string& name, int32_t file_num,
                           uint32_t dir_num, uint64_t mod_time, uint64_t length);
 
 
