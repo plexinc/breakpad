@@ -38,7 +38,10 @@
 
 #include "client/linux/minidump_writer/linux_ptrace_dumper.h"
 
+#ifndef __aarch64__
 #include <asm/ptrace.h>
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
