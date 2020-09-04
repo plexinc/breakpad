@@ -5,19 +5,24 @@ target_link_libraries(breakpad_common PRIVATE breakpad_interface)
 target_sources(breakpad_common
   PRIVATE
   convert_UTF.cc
-  dwarf_cfi_to_module.cc
-  dwarf_cu_to_module.cc
-  dwarf_line_to_module.cc
-  dwarf_range_list_handler.cc
-  language.cc
-  long_string_dictionary.cc
   md5.cc
-  module.cc
-  simple_string_dictionary.cc
   string_conversion.cc
-  test_assembler.cc
-  path_helper.cc
 )
+
+if(NOT WIN32)
+  target_sources(breakpad_common
+    PRIVATE
+    dwarf_cfi_to_module.cc
+    dwarf_cu_to_module.cc
+    dwarf_line_to_module.cc
+    dwarf_range_list_handler.cc
+    language.cc
+    long_string_dictionary.cc
+    simple_string_dictionary.cc
+    test_assembler.cc
+    module.cc
+  )
+endif()
 
 if(ANDROID)
   target_sources(breakpad_common
@@ -104,7 +109,7 @@ if(UNIX AND NOT APPLE)
 )
 endif()
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND NOT WIN32)
 
   add_executable(breakpad_common_test
     byte_cursor_unittest.cc
@@ -113,8 +118,6 @@ if(BUILD_TESTING)
     memory_range_unittest.cc
     module_unittest.cc
     simple_string_dictionary_unittest.cc
-    stabs_reader_unittest.cc
-    stabs_to_module_unittest.cc
     string_conversion_unittest.cc
     test_assembler_unittest.cc
     tests/auto_tempdir.h

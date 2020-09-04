@@ -73,6 +73,11 @@ if(WIN32)
     UNICODE
 
   )
+
+  target_include_directories(breakpad_interface
+    INTERFACE
+    "$ENV{VSINSTALLDIR}/DIA SDK/include"
+  )
 endif()
 
 add_subdirectory(src)
