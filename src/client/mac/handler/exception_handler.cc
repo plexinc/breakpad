@@ -133,7 +133,7 @@ extern "C" {
                                       exception_type_t exception,
                                       exception_data_t code,
                                       mach_msg_type_number_t code_count)
-      __attribute__((visibility("default")));
+      __attribute__((visibility("default"), used));
 }
 #endif
 
